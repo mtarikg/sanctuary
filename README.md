@@ -1,2 +1,2 @@
-# sanctuary
-Your sanctuary place for all your thoughts.
+# Sanctuary.
+A personal note-taking app covering all sorts of use cases.
