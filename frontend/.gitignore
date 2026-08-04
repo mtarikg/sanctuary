@@ -1,0 +1,116 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Flutter-specific
+build/
+.dart_tool/
+.packages
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+flutter_export_environment.sh
+.pub-cache/
+.pubignore
+coverage/
+*.lock.json
+
+# Android Studio IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.out/
+.build/
+.dependency-caches/
+.libraries/
+modules.xml
+*.orig
+.classpath
+.c9/
+.factorypath
+.apt_generated
+.springBeans
+.sts4-cache/
+bin/
+tmp/
+*.bak
+*.swp
+*~.nib
+
+# Android platform
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+android/gradlew.bak
+android/gradlew.bat
+android/gradle/
+android/key.properties
+
+# iOS platform
+ios/build/
+ios/Pods/
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+ios/Runner.xcworkspace/xcshareddata/
+ios/Runner.xcodeproj/xcshareddata/
+ios/Runner.xcodeproj/project.xcworkspace/
+
+# User-specific files
+.env
+.env.local
+.env.*.local
+*.log
+*.gz
+
+# Other
+node_modules/
+.DS_Store
+Thumbs.db
+
+# VS Code (optional)
+.vscode/
+*.code-workspace
