@@ -1,0 +1,6 @@
+@Sanctuary.API_HostAddress = http://localhost:5002
+
+GET {{Sanctuary.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
