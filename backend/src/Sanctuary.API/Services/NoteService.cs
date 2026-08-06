@@ -28,7 +28,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
         return ToResponse(note);
     }
 
-    public async Task<bool> DeleteAsync(int id, int userId)
+    public async Task<bool> DeleteAsync(int userId, int id)
     {
         var note = await dbContext.Notes
             .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id);
@@ -50,7 +50,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
             .ToListAsync();
     }
 
-    public async Task<NoteResponse?> GetByIdAsync(int id, int userId)
+    public async Task<NoteResponse?> GetByIdAsync(int userId, int id)
     {
         var note = await dbContext.Notes
             .Include(n => n.Category)
@@ -59,7 +59,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
         return note is null ? null : ToResponse(note);
     }
 
-    public async Task<NoteResponse?> UpdateAsync(int id, int userId, UpdateNoteRequest request)
+    public async Task<NoteResponse?> UpdateAsync(int userId, int id, UpdateNoteRequest request)
     {
         var note = await dbContext.Notes
             .Include(n => n.Category)

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Sanctuary.API.Data;
+using Sanctuary.API.Endpoints;
 using Sanctuary.API.Services;
 using Scalar.AspNetCore;
 
@@ -27,5 +28,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapGet("/test", () => "Hello, World! This is Sanctuary.");
+
+app.MapCategoryEndpoints();
+app.MapNoteEndPoints();
 
 app.Run();
