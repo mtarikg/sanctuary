@@ -1,4 +1,6 @@
-﻿namespace Sanctuary.API.DTOs;
+﻿using Sanctuary.API.Features.Categories.DTOs;
+
+namespace Sanctuary.API.Features.Notes.DTOs;
 
 public record NoteResponse
 {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sanctuary.API.Data;
-using Sanctuary.API.DTOs;
+using Sanctuary.API.Features.Categories.DTOs;
 
-namespace Sanctuary.API.Services;
+namespace Sanctuary.API.Features.Categories;
 
 public class CategoryService(AppDbContext dbContext) : ICategoryService
 {

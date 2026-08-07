@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sanctuary.API.Data;
-using Sanctuary.API.Endpoints;
-using Sanctuary.API.Services;
+using Sanctuary.API.Features.Categories;
+using Sanctuary.API.Features.Notes;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);

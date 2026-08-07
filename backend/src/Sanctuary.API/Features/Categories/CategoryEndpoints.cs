@@ -1,6 +1,4 @@
-﻿using Sanctuary.API.Services;
-
-namespace Sanctuary.API.Endpoints;
+﻿namespace Sanctuary.API.Features.Categories;
 
 public static class CategoryEndpoints
 {

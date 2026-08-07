@@ -1,4 +1,4 @@
-﻿namespace Sanctuary.API.DTOs;
+﻿namespace Sanctuary.API.Features.Categories.DTOs;
 
 public record CategoryResponse
 {

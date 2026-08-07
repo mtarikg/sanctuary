@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sanctuary.API.DTOs;
+namespace Sanctuary.API.Features.Notes.DTOs;
 
 public record UpdateNoteRequest
 {

@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sanctuary.API.Data;
-using Sanctuary.API.DTOs;
 using Sanctuary.API.Entities;
+using Sanctuary.API.Features.Categories.DTOs;
+using Sanctuary.API.Features.Notes.DTOs;
 
-namespace Sanctuary.API.Services;
+namespace Sanctuary.API.Features.Notes;
 
 public class NoteService(AppDbContext dbContext) : INoteService
 {

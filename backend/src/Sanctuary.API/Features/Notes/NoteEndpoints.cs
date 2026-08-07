@@ -1,7 +1,6 @@
-﻿using Sanctuary.API.DTOs;
-using Sanctuary.API.Services;
+﻿using Sanctuary.API.Features.Notes.DTOs;
 
-namespace Sanctuary.API.Endpoints;
+namespace Sanctuary.API.Features.Notes;
 
 public static class NoteEndpoints
 {

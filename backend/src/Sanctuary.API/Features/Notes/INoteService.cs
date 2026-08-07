@@ -1,6 +1,6 @@
-﻿using Sanctuary.API.DTOs;
+﻿using Sanctuary.API.Features.Notes.DTOs;
 
-namespace Sanctuary.API.Services;
+namespace Sanctuary.API.Features.Notes;
 
 public interface INoteService
 {
