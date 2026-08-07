@@ -12,6 +12,18 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connect
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<INoteService, NoteService>();
 
+builder.Services.AddValidation();
+
+builder.Services.AddProblemDetails(opt =>
+{
+    opt.CustomizeProblemDetails = context =>
+    {
+        if (context.ProblemDetails.Status == StatusCodes.Status400BadRequest)
+            context.ProblemDetails.Title = "Please complete all required fields.";
+    };
+}
+);
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
