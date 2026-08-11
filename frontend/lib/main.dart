@@ -1,86 +1,66 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:frontend/screens/favorites_screen.dart';
+import 'package:frontend/screens/search_screen.dart';
+import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const SanctuaryApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SanctuaryApp extends StatelessWidget {
+  const SanctuaryApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'sanctuary-app',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.lightBlue),
         appBarTheme: const AppBarTheme(centerTitle: true),
       ),
-      home: const MyHomePage(title: 'Sanctuary.'),
+      home: const MainShell(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class MainShell extends StatefulWidget {
+  const MainShell({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MainShell> createState() => _MainShellState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MainShellState extends State<MainShell> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = const [
+    HomeScreen(),
+    SearchScreen(),
+    FavoritesScreen(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            const Text('Your sanctuary place for all your thoughts.'),
-            Text(_result),
-          ],
-        ),
-      ),
-      floatingActionButton: Row(
-        children: [
-          FloatingActionButton(
-            onPressed: _fetchNotes,
-            child: const Icon(Icons.add),
+      body: _screens[_currentIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) => setState(() => _currentIndex = index),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Home',
           ),
-          SizedBox(width: 15, height: 15),
-          FloatingActionButton(
-            onPressed: () => _deleteNoteById(9),
-            child: const Icon(Icons.delete),
+          NavigationDestination(icon: Icon(Icons.search), label: 'Search'),
+          NavigationDestination(
+            icon: Icon(Icons.star_outline),
+            selectedIcon: Icon(Icons.star),
+            label: 'Favorites',
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
-  }
-
-  String _result = '';
-
-  Future<void> _fetchNotes() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5002/notes'));
-
-    setState(() {
-      _result = 'Status: ${response.statusCode}\n${response.body}';
-    });
-  }
-
-  Future<void> _deleteNoteById(int id) async {
-    final response = await http.delete(
-      Uri.parse('http://10.0.2.2:5002/notes/$id'),
-    );
-
-    setState(() {
-      _result = 'Status: ${response.statusCode}\n${response.body}';
-    });
   }
 }

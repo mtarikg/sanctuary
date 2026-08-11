@@ -100,7 +100,7 @@ ios/Runner.xcodeproj/xcshareddata/
 ios/Runner.xcodeproj/project.xcworkspace/
 
 # User-specific files
-.env
+.env*
 .env.local
 .env.*.local
 *.log
@@ -114,3 +114,8 @@ Thumbs.db
 # VS Code (optional)
 .vscode/
 *.code-workspace
+
+# Environment and config files
+.env*
+*.local.json
+secrets.json
