@@ -12,7 +12,7 @@ class _SearchScreenState extends State<SearchScreen> {
   String _query = '';
 
   @override
-  dispose() {
+  void dispose() {
     _searchController.dispose();
     super.dispose();
   }

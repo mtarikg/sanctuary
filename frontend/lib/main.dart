@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/auth_screen.dart';
 import 'package:frontend/screens/favorites_screen.dart';
 import 'package:frontend/screens/search_screen.dart';
 import 'screens/home_screen.dart';
@@ -19,7 +20,7 @@ class SanctuaryApp extends StatelessWidget {
         colorScheme: .fromSeed(seedColor: Colors.lightBlue),
         appBarTheme: const AppBarTheme(centerTitle: true),
       ),
-      home: const MainShell(),
+      home: const AuthScreen(),
     );
   }
 }
