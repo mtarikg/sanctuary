@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/note.dart';
+import 'package:frontend/models/category.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
+import 'package:frontend/screens/note_form_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final NoteNotifier notifier;
@@ -19,7 +21,12 @@ class HomeScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: FloatingActionButton.small(
-                  onPressed: () {},
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => NoteFormScreen(notifier: notifier),
+                    ),
+                  ),
                   child: const Icon(Icons.add),
                 ),
               ),

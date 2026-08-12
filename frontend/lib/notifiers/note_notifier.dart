@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:frontend/models/category.dart';
-import 'package:frontend/models/note.dart';
-import 'package:frontend/screens/auth_screen.dart';
 import 'package:http/http.dart' as http;
+import '../models/category.dart';
+import '../models/note.dart';
+import '../screens/auth_screen.dart';
 
 class NoteNotifier extends ChangeNotifier {
   List<Category> categories = [];
@@ -56,11 +56,11 @@ class NoteNotifier extends ChangeNotifier {
       final requestBody = {
         'title': title,
         'body': body,
-        if (categoryId != null) 'categoryId': categoryId,
+        'categoryId': categoryId,
       };
 
       final response = await http.post(
-        Uri.parse('_base/notes'),
+        Uri.parse('$_base/notes'),
         headers: _headers,
         body: jsonEncode(requestBody),
       );
@@ -71,6 +71,7 @@ class NoteNotifier extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
+        print('addNote error: $e');
       // gonna handle in refactor
     }
   }
