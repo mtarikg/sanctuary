@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/notifiers/note_notifier.dart';
 import 'package:frontend/screens/auth_screen.dart';
 import 'package:frontend/screens/favorites_screen.dart';
 import 'package:frontend/screens/search_screen.dart';
@@ -34,17 +35,30 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
+  final NoteNotifier _noteNotifier = NoteNotifier();
 
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    SearchScreen(),
-    FavoritesScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _noteNotifier.fetchAll();
+  }
+
+  @override
+  void dispose() {
+    _noteNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> screens = [
+      HomeScreen(notifier: _noteNotifier),
+      const SearchScreen(),
+      const FavoritesScreen(),
+    ];
+
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: screens[_currentIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) => setState(() => _currentIndex = index),
