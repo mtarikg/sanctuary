@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/main.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 String? authToken;
+final _storage = FlutterSecureStorage();
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -98,6 +100,7 @@ class _AuthScreenState extends State<AuthScreen> {
         final token = data['token'];
 
         authToken = token;
+        await _storage.write(key: 'auth_token', value: token);
 
         if (mounted) {
           Navigator.of(context).pushReplacement(
@@ -106,8 +109,7 @@ class _AuthScreenState extends State<AuthScreen> {
         }
       } else if (response.statusCode == 401) {
         setState(() => _errorMessage = 'Incorrect email or password.');
-      }   
-      else {
+      } else {
         final data = jsonDecode(response.body);
         setState(
           () => _errorMessage =
