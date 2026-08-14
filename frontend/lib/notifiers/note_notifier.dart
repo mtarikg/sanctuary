@@ -40,6 +40,7 @@ class NoteNotifier extends ChangeNotifier {
       if (notesResult.statusCode == 200) {
         final List<dynamic> data = jsonDecode(notesResult.body);
         notes = data.map((e) => Note.fromJson(e)).toList();
+        _sortNotes();
       } else {
         error = 'Failed to load notes.';
       }
@@ -56,7 +57,7 @@ class NoteNotifier extends ChangeNotifier {
       final requestBody = {
         'title': title,
         'body': body,
-        'categoryId': categoryId,
+        'categoryId': ?categoryId,
       };
 
       final response = await http.post(
@@ -68,11 +69,70 @@ class NoteNotifier extends ChangeNotifier {
       if (response.statusCode == 201) {
         final note = Note.fromJson(jsonDecode(response.body));
         notes.insert(0, note);
+        _sortNotes();
         notifyListeners();
       }
     } catch (e) {
-        print('addNote error: $e');
+      print('addNote error: $e');
       // gonna handle in refactor
     }
+  }
+
+  Future<void> updateNote(
+    String id,
+    String title,
+    String body, {
+    int? categoryId,
+  }) async {
+    try {
+      final requestBody = {
+        'title': title,
+        'body': body,
+        'categoryId': categoryId,
+      };
+
+      final response = await http.put(
+        Uri.parse('$_base/notes/$id'),
+        headers: _headers,
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final updated = Note.fromJson(jsonDecode(response.body));
+        final index = notes.indexWhere((n) => n.id == id);
+
+        if (index != -1) {
+          notes[index] = updated;
+          _sortNotes();
+          notifyListeners();
+        }
+      }
+    } catch (e) {
+      print('updateNote error: $e');
+    }
+  }
+
+  Future<void> deleteNote(String id) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$_base/notes/$id'),
+        headers: _headers,
+      );
+
+      if (response.statusCode == 204) {
+        notes.removeWhere((n) => n.id == id);
+        notifyListeners();
+      }
+    } catch (e) {
+      print('deleteNote error: $e');
+    }
+  }
+
+  void _sortNotes() {
+    notes.sort((a, b) {
+      final aDate = a.updatedAt ?? a.createdAt;
+      final bDate = b.updatedAt ?? b.createdAt;
+      return bDate.compareTo(aDate);
+    });
   }
 }

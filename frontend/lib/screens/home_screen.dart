@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/note.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
+import 'package:frontend/screens/note_detail_screen.dart';
 import 'package:frontend/screens/note_form_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -46,7 +47,7 @@ class HomeScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   itemCount: notifier.notes.length,
                   itemBuilder: (context, index) =>
-                      NoteCard(note: notifier.notes[index]),
+                      NoteCard(note: notifier.notes[index], notifier: notifier),
                 ),
         );
       },
@@ -56,12 +57,14 @@ class HomeScreen extends StatelessWidget {
 
 class NoteCard extends StatelessWidget {
   final Note note;
+  final NoteNotifier notifier;
 
-  const NoteCard({super.key, required this.note});
+  const NoteCard({super.key, required this.note, required this.notifier});
 
   @override
   Widget build(BuildContext context) {
-    final date = '${note.createdAt.day} ${_month(note.createdAt.month)}';
+    final displayDate = note.updatedAt ?? note.createdAt;
+    final date = '${displayDate.day} ${_month(displayDate.month)}';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -70,7 +73,12 @@ class NoteCard extends StatelessWidget {
       color: Colors.white,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {},
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => NoteDetailScreen(note: note, notifier: notifier),
+          ),
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Column(

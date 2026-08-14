@@ -77,8 +77,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     itemCount: _filtered.length,
-                    itemBuilder: ((context, index) =>
-                        NoteCard(note: _filtered[index])),
+                    itemBuilder: ((context, index) => NoteCard(
+                      note: _filtered[index],
+                      notifier: widget.notifier,
+                    )),
                   ),
           ),
         ],
