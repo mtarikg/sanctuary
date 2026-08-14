@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/notifiers/note_notifier.dart';
+import 'package:frontend/screens/home_screen.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  final NoteNotifier notifier;
+
+  const SearchScreen({super.key, required this.notifier});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -10,6 +14,19 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
+
+  List<dynamic> get _filtered {
+    if (_query.trim().isEmpty) return [];
+
+    final q = _query.toLowerCase();
+    return widget.notifier.notes
+        .where(
+          (n) =>
+              n.title.toLowerCase().contains(q) ||
+              n.body.toLowerCase().contains(q),
+        )
+        .toList();
+  }
 
   @override
   void dispose() {
@@ -43,14 +60,26 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           const SizedBox(height: 12),
           Expanded(
-            child: _query.isEmpty
+            child: _query.trim().isEmpty
                 ? const Center(
                     child: Text(
                       'Start typing to search your notes',
                       style: TextStyle(color: Colors.grey),
                     ),
                   )
-                : const Center(child: Text('No results yet.')),
+                : _filtered.isEmpty
+                ? const Center(
+                    child: Text(
+                      'No notes found.',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    itemCount: _filtered.length,
+                    itemBuilder: ((context, index) =>
+                        NoteCard(note: _filtered[index])),
+                  ),
           ),
         ],
       ),

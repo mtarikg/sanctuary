@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/note.dart';
-import 'package:frontend/models/category.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
 import 'package:frontend/screens/note_form_screen.dart';
 

@@ -61,7 +61,7 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     final List<Widget> screens = [
       HomeScreen(notifier: _noteNotifier),
-      const SearchScreen(),
+      SearchScreen(notifier: _noteNotifier),
       const FavoritesScreen(),
     ];
 
