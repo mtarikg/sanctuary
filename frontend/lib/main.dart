@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/notifiers/note_notifier.dart';
 import 'package:frontend/screens/auth_screen.dart';
 import 'package:frontend/screens/favorites_screen.dart';
 import 'package:frontend/screens/search_screen.dart';
@@ -12,13 +12,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final token = await _storage.read(key: 'auth_token');
   if (token != null) authToken = token;
-  runApp(SanctuaryApp(isAuthenticated: token != null));
+  runApp(const ProviderScope(child: SanctuaryApp()));
 }
 
 class SanctuaryApp extends StatelessWidget {
-  final bool isAuthenticated;
-
-  const SanctuaryApp({super.key, required this.isAuthenticated});
+  const SanctuaryApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +24,10 @@ class SanctuaryApp extends StatelessWidget {
       title: 'sanctuary-app',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.lightBlue),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
         appBarTheme: const AppBarTheme(centerTitle: true),
       ),
-      home: isAuthenticated ? const MainShell() : const AuthScreen(),
+      home: const MainShell(),
     );
   }
 }
@@ -43,26 +41,13 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
-  final NoteNotifier _noteNotifier = NoteNotifier();
-
-  @override
-  void initState() {
-    super.initState();
-    _noteNotifier.fetchAll();
-  }
-
-  @override
-  void dispose() {
-    _noteNotifier.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> screens = [
-      HomeScreen(notifier: _noteNotifier),
-      SearchScreen(notifier: _noteNotifier),
-      const FavoritesScreen(),
+    final List<Widget> screens = const [
+      HomeScreen(),
+      SearchScreen(),
+      FavoritesScreen(),
     ];
 
     return Scaffold(

@@ -1,32 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
 import 'package:frontend/screens/home_screen.dart';
 
-class SearchScreen extends StatefulWidget {
-  final NoteNotifier notifier;
-
-  const SearchScreen({super.key, required this.notifier});
+class SearchScreen extends ConsumerStatefulWidget {
+  const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
-
-  List<dynamic> get _filtered {
-    if (_query.trim().isEmpty) return [];
-
-    final q = _query.toLowerCase();
-    return widget.notifier.notes
-        .where(
-          (n) =>
-              n.title.toLowerCase().contains(q) ||
-              n.body.toLowerCase().contains(q),
-        )
-        .toList();
-  }
 
   @override
   void dispose() {
@@ -36,6 +22,19 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(noteNotifierProvider);
+
+    final q = _query.toLowerCase();
+    final filtered = _query.trim().isEmpty
+        ? <dynamic>[]
+        : state.notes
+              .where(
+                (n) =>
+                    n.title.toLowerCase().contains(q) ||
+                    n.body.toLowerCase().contains(q),
+              )
+              .toList();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Search')),
       body: Column(
@@ -67,7 +66,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       style: TextStyle(color: Colors.grey),
                     ),
                   )
-                : _filtered.isEmpty
+                : filtered.isEmpty
                 ? const Center(
                     child: Text(
                       'No notes found.',
@@ -76,11 +75,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    itemCount: _filtered.length,
-                    itemBuilder: ((context, index) => NoteCard(
-                      note: _filtered[index],
-                      notifier: widget.notifier,
-                    )),
+                    itemCount: filtered.length,
+                    itemBuilder: ((context, index) =>
+                        NoteCard(note: filtered[index])),
                   ),
           ),
         ],

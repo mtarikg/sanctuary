@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/category.dart';
 import 'package:frontend/models/note.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
 
-class NoteDetailScreen extends StatefulWidget {
+class NoteDetailScreen extends ConsumerStatefulWidget {
   final Note note;
-  final NoteNotifier notifier;
 
-  const NoteDetailScreen({
-    super.key,
-    required this.note,
-    required this.notifier,
-  });
+  const NoteDetailScreen({super.key, required this.note});
 
   @override
-  State<NoteDetailScreen> createState() => _NoteDetailScreenState();
+  ConsumerState<NoteDetailScreen> createState() => _NoteDetailScreenState();
 }
 
-class _NoteDetailScreenState extends State<NoteDetailScreen> {
+class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
   bool _editing = false;
   Category? _selectedCategory;
   late TextEditingController _titleController;
@@ -50,12 +46,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       return;
     }
 
-    await widget.notifier.updateNote(
-      widget.note.id,
-      _titleController.text.trim(),
-      _bodyController.text.trim(),
-      categoryId: _selectedCategory?.id,
-    );
+    await ref
+        .read(noteNotifierProvider.notifier)
+        .updateNote(
+          widget.note.id,
+          _titleController.text.trim(),
+          _bodyController.text.trim(),
+          categoryId: _selectedCategory?.id,
+        );
 
     if (mounted) Navigator.pop(context);
   }
@@ -80,13 +78,15 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     );
 
     if (confirm == true && mounted) {
-      await widget.notifier.deleteNote(widget.note.id);
+      await ref.read(noteNotifierProvider.notifier).deleteNote(widget.note.id);
       if (mounted) Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final categories = ref.read(noteNotifierProvider).categories;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_editing ? 'Edit note' : 'Note'),
@@ -118,7 +118,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: _editing ? _editView() : readView(),
+        child: _editing ? _editView(categories) : readView(),
       ),
     );
   }
@@ -145,14 +145,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     );
   }
 
-  Widget _editView() {
+  Widget _editView(List<Category> categories) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         DropdownButtonFormField<Category>(
           value: _selectedCategory,
           hint: const Text('Category (optional)'),
-          items: widget.notifier.categories
+          items: categories
               .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
               .toList(),
           onChanged: (val) => setState(() => _selectedCategory = val),

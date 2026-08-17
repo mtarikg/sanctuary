@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/notifiers/note_notifier.dart';
 import '../models/category.dart';
-import '../notifiers/note_notifier.dart';
 
-class NoteFormScreen extends StatefulWidget {
-  final NoteNotifier notifier;
-  const NoteFormScreen({super.key, required this.notifier});
+class NoteFormScreen extends ConsumerStatefulWidget {
+  const NoteFormScreen({super.key});
 
   @override
-  State<NoteFormScreen> createState() => _NoteFormScreenState();
+  ConsumerState<NoteFormScreen> createState() => _NoteFormScreenState();
 }
 
-class _NoteFormScreenState extends State<NoteFormScreen> {
+class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
   final _titleController = TextEditingController();
   final _bodyController = TextEditingController();
   Category? _selectedCategory;
@@ -29,17 +29,21 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
       return;
     }
 
-    await widget.notifier.addNote(
-      _titleController.text.trim(),
-      _bodyController.text.trim(),
-      categoryId: _selectedCategory?.id,
-    );
+    await ref
+        .read(noteNotifierProvider.notifier)
+        .addNote(
+          _titleController.text.trim(),
+          _bodyController.text.trim(),
+          categoryId: _selectedCategory?.id,
+        );
 
     if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    final categories = ref.read(noteNotifierProvider).categories;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('New note'),
@@ -67,7 +71,7 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
             DropdownButtonFormField<Category>(
               value: _selectedCategory,
               hint: const Text('Category (optional)'),
-              items: widget.notifier.categories
+              items: categories
                   .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
                   .toList(),
               onChanged: (val) => setState(() => _selectedCategory = val),

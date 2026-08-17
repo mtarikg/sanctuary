@@ -1,76 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/note.dart';
-import 'package:frontend/notifiers/note_notifier.dart';
-import 'package:frontend/screens/note_detail_screen.dart';
-import 'package:frontend/screens/note_form_screen.dart';
-import 'package:frontend/screens/settings_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/note.dart';
+import '../notifiers/note_notifier.dart';
+import '../screens/note_detail_screen.dart';
+import '../screens/note_form_screen.dart';
+import '../screens/settings_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  final NoteNotifier notifier;
-
-  const HomeScreen({super.key, required this.notifier});
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: notifier,
-      builder: (context, _) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Sanctuary.'),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: FloatingActionButton.small(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => NoteFormScreen(notifier: notifier),
-                    ),
-                  ),
-                  child: const Icon(Icons.add),
-                ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(noteNotifierProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Sanctuary.'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: FloatingActionButton.small(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => NoteFormScreen()),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: IconButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                  ),
-                  icon: const Icon(Icons.settings_outlined),
-                ),
-              ),
-            ],
+              child: const Icon(Icons.add),
+            ),
           ),
-          body: notifier.loading
-              ? const Center(child: CircularProgressIndicator())
-              : notifier.error != null
-              ? Center(child: Text(notifier.error!))
-              : notifier.notes.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No notes yet.',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(12),
-                  itemCount: notifier.notes.length,
-                  itemBuilder: (context, index) =>
-                      NoteCard(note: notifier.notes[index], notifier: notifier),
-                ),
-        );
-      },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: IconButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              ),
+              icon: const Icon(Icons.settings_outlined),
+            ),
+          ),
+        ],
+      ),
+      body: state.loading
+          ? const Center(child: CircularProgressIndicator())
+          : state.error != null
+          ? Center(child: Text(state.error!))
+          : state.notes.isEmpty
+          ? const Center(
+              child: Text(
+                'No notes yet.',
+                style: TextStyle(color: Colors.grey),
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: state.notes.length,
+              itemBuilder: (context, index) =>
+                  NoteCard(note: state.notes[index]),
+            ),
     );
   }
 }
 
 class NoteCard extends StatelessWidget {
   final Note note;
-  final NoteNotifier notifier;
 
-  const NoteCard({super.key, required this.note, required this.notifier});
+  const NoteCard({super.key, required this.note});
 
   @override
   Widget build(BuildContext context) {
@@ -86,9 +79,7 @@ class NoteCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => NoteDetailScreen(note: note, notifier: notifier),
-          ),
+          MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
