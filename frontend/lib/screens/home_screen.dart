@@ -3,6 +3,7 @@ import 'package:frontend/models/note.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
 import 'package:frontend/screens/note_detail_screen.dart';
 import 'package:frontend/screens/note_form_screen.dart';
+import 'package:frontend/screens/settings_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final NoteNotifier notifier;
@@ -28,6 +29,16 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   child: const Icon(Icons.add),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                child: IconButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                  ),
+                  icon: const Icon(Icons.settings_outlined),
                 ),
               ),
             ],
