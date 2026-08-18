@@ -1,25 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:frontend/constants/constants.dart';
+import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/screens/auth_screen.dart';
 import 'package:frontend/screens/favorites_screen.dart';
 import 'package:frontend/screens/search_screen.dart';
 import 'screens/home_screen.dart';
 
-final _storage = FlutterSecureStorage();
+final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final token = await _storage.read(key: 'auth_token');
-  if (token != null) authToken = token;
-  runApp(const ProviderScope(child: SanctuaryApp()));
+  final token = await const FlutterSecureStorage().read(
+    key: AppConstants.authTokenKey,
+  );
+  runApp(
+    ProviderScope(
+      overrides: [authTokenProvider.overrideWith((ref) => token)],
+      child: const SanctuaryApp(),
+    ),
+  );
 }
 
-class SanctuaryApp extends StatelessWidget {
+class SanctuaryApp extends ConsumerWidget {
   const SanctuaryApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final token = ref.watch(authTokenProvider);
+
+    ref.listen(authTokenProvider, ((previous, next) {
+      if (next == null) {
+        navigatorKey.currentState?.pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => AuthScreen()),
+          (_) => false,
+        );
+      } else if (next != null && previous == null) {
+        navigatorKey.currentState?.pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => MainShell()),
+          (_) => false,
+        );
+      }
+    }));
+
     return MaterialApp(
       title: 'sanctuary-app',
       debugShowCheckedModeBanner: false,
@@ -27,7 +51,8 @@ class SanctuaryApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
         appBarTheme: const AppBarTheme(centerTitle: true),
       ),
-      home: const MainShell(),
+      navigatorKey: navigatorKey,
+      home: token != null ? const MainShell() : const AuthScreen(),
     );
   }
 }

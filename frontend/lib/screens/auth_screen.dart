@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/main.dart';
+import 'package:frontend/constants/constants.dart';
+import 'package:frontend/providers/auth_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-String? authToken;
 final _storage = FlutterSecureStorage();
 
-class AuthScreen extends StatefulWidget {
+class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
 
   @override
-  State<AuthScreen> createState() => _AuthScreenState();
+  ConsumerState<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class _AuthScreenState extends ConsumerState<AuthScreen> {
   bool _isLogin = true;
 
   final _emailController = TextEditingController();
@@ -74,8 +75,8 @@ class _AuthScreenState extends State<AuthScreen> {
     try {
       final url = Uri.parse(
         _isLogin
-            ? 'http://10.0.2.2:5002/auth/login'
-            : 'http://10.0.2.2:5002/auth/register',
+            ? '${AppConstants.baseUrl}/auth/login'
+            : '${AppConstants.baseUrl}/auth/register',
       );
 
       final body = _isLogin
@@ -99,14 +100,8 @@ class _AuthScreenState extends State<AuthScreen> {
         final data = jsonDecode(response.body);
         final token = data['token'];
 
-        authToken = token;
-        await _storage.write(key: 'auth_token', value: token);
-
-        if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const MainShell()),
-          );
-        }
+        await _storage.write(key: AppConstants.authTokenKey, value: token);
+        ref.read(authTokenProvider.notifier).state = token;
       } else if (response.statusCode == 401) {
         setState(() => _errorMessage = 'Incorrect email or password.');
       } else {
