@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/constants/constants.dart';
-import 'package:frontend/main.dart';
 import 'package:frontend/providers/auth_provider.dart';
-import 'package:frontend/screens/auth_screen.dart';
+import 'package:frontend/services/auth_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -26,7 +23,8 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _signOut(BuildContext context, WidgetRef ref) async {
-    await const FlutterSecureStorage().delete(key: AppConstants.authTokenKey);
+    final authService = AuthService();
+    await authService.clearToken();
     ref.read(authTokenProvider.notifier).state = null;
   }
 }

@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/constants/constants.dart';
 import 'package:frontend/providers/auth_provider.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-final _storage = FlutterSecureStorage();
+import 'package:frontend/services/auth_service.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -72,47 +67,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       return;
     }
 
-    try {
-      final url = Uri.parse(
-        _isLogin
-            ? '${AppConstants.baseUrl}/auth/login'
-            : '${AppConstants.baseUrl}/auth/register',
-      );
+    final authService = AuthService();
+    final result = _isLogin
+        ? await authService.login(
+            _emailController.text.trim(),
+            _passwordController.text,
+          )
+        : await authService.register(
+            _usernameController.text.trim(),
+            _emailController.text.trim(),
+            _passwordController.text,
+          );
 
-      final body = _isLogin
-          ? {
-              'email': _emailController.text.trim(),
-              'password': _passwordController.text,
-            }
-          : {
-              'username': _usernameController.text.trim(),
-              'email': _emailController.text.trim(),
-              'password': _passwordController.text,
-            };
-
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        final token = data['token'];
-
-        await _storage.write(key: AppConstants.authTokenKey, value: token);
-        ref.read(authTokenProvider.notifier).state = token;
-      } else if (response.statusCode == 401) {
-        setState(() => _errorMessage = 'Incorrect email or password.');
-      } else {
-        final data = jsonDecode(response.body);
-        setState(
-          () => _errorMessage =
-              data['errors']?.toString() ?? 'Something went wrong.',
-        );
-      }
-    } catch (e) {
-      setState(() => _errorMessage = 'Could not reach the server.');
+    if (result.isSuccess) {
+      await authService.saveToken(result.token!);
+      ref.read(authTokenProvider.notifier).state = result.token;
+    } else {
+      setState(() => _errorMessage = result.error);
     }
   }
 

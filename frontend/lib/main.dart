@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/constants/constants.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/screens/auth_screen.dart';
 import 'package:frontend/screens/favorites_screen.dart';
 import 'package:frontend/screens/search_screen.dart';
+import 'package:frontend/services/auth_service.dart';
 import 'screens/home_screen.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final token = await const FlutterSecureStorage().read(
-    key: AppConstants.authTokenKey,
-  );
+  final token = await AuthService().getToken();
   runApp(
     ProviderScope(
       overrides: [authTokenProvider.overrideWith((ref) => token)],
