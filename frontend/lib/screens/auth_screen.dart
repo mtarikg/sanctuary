@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/services/auth_service.dart';
+import 'package:frontend/utils/validators.dart';
+import 'package:frontend/widgets/primary_button.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -44,26 +46,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   Future<void> _submit() async {
     setState(() => _errorMessage = null);
 
-    if (!_isLogin && _usernameController.text.trim().isEmpty) {
-      setState(() => _errorMessage = 'Enter a username.');
-      return;
-    }
+    final error = validateAuthForm(
+      isLogin: _isLogin,
+      username: _usernameController.text,
+      email: _emailController.text,
+      password: _passwordController.text,
+      confirmPassword: _confirmPasswordController.text,
+    );
 
-    if (_emailController.text.trim().isEmpty) {
-      setState(() => _errorMessage = 'Enter an email address.');
-      return;
-    }
-
-    if (_passwordController.text.length < 8) {
-      setState(
-        () => _errorMessage = 'Password must be at least 8 characters long.',
-      );
-      return;
-    }
-
-    if (!_isLogin &&
-        _passwordController.text != _confirmPasswordController.text) {
-      setState(() => _errorMessage = 'Passwords do not match.');
+    if (error != null) {
+      setState(() => _errorMessage = error);
       return;
     }
 
@@ -182,20 +174,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ),
               ],
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _submit,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(8),
-                    ),
-                  ),
-                  child: Text(_isLogin ? 'Login' : 'Create account'),
-                ),
-              ),
+              PrimaryButton(label: 'Login', onPressed: _submit),
               const SizedBox(height: 16),
               Center(
                 child: TextButton(

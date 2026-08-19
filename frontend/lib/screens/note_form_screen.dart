@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
+import 'package:frontend/widgets/note_form_fields.dart';
 import '../models/category.dart';
 
 class NoteFormScreen extends ConsumerStatefulWidget {
@@ -53,7 +54,7 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
             child: FilledButton(
               onPressed: _submit,
               style: FilledButton.styleFrom(
-                backgroundColor: Colors.black,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -68,62 +69,15 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DropdownButtonFormField<Category>(
-              value: _selectedCategory,
-              hint: const Text('Category (optional)'),
-              items: categories
-                  .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
-                  .toList(),
-              onChanged: (val) => setState(() => _selectedCategory = val),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-              ),
+            NoteFormFields(
+              titleController: _titleController,
+              bodyController: _bodyController,
+              categories: categories,
+              selectedCategory: _selectedCategory,
+              onCategoryChanged: (val) =>
+                  setState(() => _selectedCategory = val),
+              error: _error,
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                hintText: 'Title',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                counterText: '',
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _bodyController,
-              maxLines: null,
-              minLines: 6,
-              keyboardType: TextInputType.multiline,
-              decoration: InputDecoration(
-                hintText: 'Write something...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-              ),
-            ),
-            if (_error != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                _error!,
-                style: const TextStyle(fontSize: 12, color: Colors.red),
-              ),
-            ],
           ],
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/category.dart';
 import 'package:frontend/models/note.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
+import 'package:frontend/widgets/note_form_fields.dart';
 
 class NoteDetailScreen extends ConsumerStatefulWidget {
   final Note note;
@@ -85,8 +86,6 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = ref.read(noteNotifierProvider).categories;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(_editing ? 'Edit note' : 'Note'),
@@ -106,7 +105,7 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
               child: FilledButton(
                 onPressed: _save,
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -118,7 +117,7 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: _editing ? _editView(categories) : readView(),
+        child: _editing ? _editView() : readView(),
       ),
     );
   }
@@ -145,59 +144,20 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
     );
   }
 
-  Widget _editView(List<Category> categories) {
+  Widget _editView() {
+    final categories = ref.watch(noteNotifierProvider).categories;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        DropdownButtonFormField<Category>(
-          value: _selectedCategory,
-          hint: const Text('Category (optional)'),
-          items: categories
-              .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
-              .toList(),
-          onChanged: (val) => setState(() => _selectedCategory = val),
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-          ),
+        NoteFormFields(
+          titleController: _titleController,
+          bodyController: _bodyController,
+          categories: categories,
+          selectedCategory: _selectedCategory,
+          onCategoryChanged: (val) => setState(() => _selectedCategory = val),
+          error: _error,
         ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _titleController,
-          decoration: InputDecoration(
-            hintText: 'Title',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _bodyController,
-          minLines: 6,
-          maxLines: null,
-          keyboardType: TextInputType.multiline,
-          decoration: InputDecoration(
-            hintText: 'Write something...',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-          ),
-        ),
-        if (_error != null) ...[
-          const SizedBox(height: 8),
-          Text(
-            _error!,
-            style: const TextStyle(fontSize: 12, color: Colors.red),
-          ),
-        ],
       ],
     );
   }

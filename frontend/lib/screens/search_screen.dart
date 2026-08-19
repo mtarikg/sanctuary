@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
-import 'package:frontend/screens/home_screen.dart';
+import 'package:frontend/utils/note_utils.dart';
+import 'package:frontend/widgets/note_card.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -23,17 +24,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(noteNotifierProvider);
-
-    final q = _query.toLowerCase();
-    final filtered = _query.trim().isEmpty
-        ? <dynamic>[]
-        : state.notes
-              .where(
-                (n) =>
-                    n.title.toLowerCase().contains(q) ||
-                    n.body.toLowerCase().contains(q),
-              )
-              .toList();
+    final filtered = filterNotes(state.notes, _query);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Search')),
