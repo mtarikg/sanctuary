@@ -31,15 +31,19 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
       return;
     }
 
-    await ref
-        .read(noteNotifierProvider.notifier)
-        .addNote(
-          _titleController.text.trim(),
-          _bodyController.text.trim(),
-          categoryId: _selectedCategory?.id,
-        );
+    try {
+      await ref
+          .read(noteNotifierProvider.notifier)
+          .addNote(
+            _titleController.text.trim(),
+            _bodyController.text.trim(),
+            categoryId: _selectedCategory?.id,
+          );
 
-    if (mounted) context.pop();
+      if (mounted) context.pop();
+    } catch (e) {
+      setState(() => _error = 'Failed to add note. Try again.');
+    }
   }
 
   @override

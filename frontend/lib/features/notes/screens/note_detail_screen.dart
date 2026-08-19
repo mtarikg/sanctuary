@@ -48,16 +48,20 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
       return;
     }
 
-    await ref
-        .read(noteNotifierProvider.notifier)
-        .updateNote(
-          widget.note.id,
-          _titleController.text.trim(),
-          _bodyController.text.trim(),
-          categoryId: _selectedCategory?.id,
-        );
+    try {
+      await ref
+          .read(noteNotifierProvider.notifier)
+          .updateNote(
+            widget.note.id,
+            _titleController.text.trim(),
+            _bodyController.text.trim(),
+            categoryId: _selectedCategory?.id,
+          );
 
-    if (mounted) context.pop();
+      if (mounted) context.pop();
+    } catch (e) {
+      setState(() => _error = 'Failed to save note. Try again.');
+    }
   }
 
   Future<void> _delete() async {
@@ -80,8 +84,18 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
     );
 
     if (confirm == true && mounted) {
-      await ref.read(noteNotifierProvider.notifier).deleteNote(widget.note.id);
-      if (mounted) context.pop();
+      try {
+        await ref
+            .read(noteNotifierProvider.notifier)
+            .deleteNote(widget.note.id);
+        if (mounted) context.pop();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to delete note. Try again.')),
+          );
+        }
+      }
     }
   }
 

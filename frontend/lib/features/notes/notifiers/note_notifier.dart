@@ -80,19 +80,15 @@ class NoteNotifier extends _$NoteNotifier {
   }
 
   Future<void> addNote(String title, String body, {int? categoryId}) async {
-    try {
-      final note = await _noteService.addNote(
-        title,
-        body,
-        categoryId: categoryId,
-      );
+    final note = await _noteService.addNote(
+      title,
+      body,
+      categoryId: categoryId,
+    );
 
-      final updated = [...state.notes, note];
-      _sortNotes(updated);
-      state = state.copyWith(notes: updated);
-    } catch (e) {
-      print('addNote error: $e');
-    }
+    final updated = [...state.notes, note];
+    _sortNotes(updated);
+    state = state.copyWith(notes: updated);
   }
 
   Future<void> updateNote(
@@ -101,34 +97,26 @@ class NoteNotifier extends _$NoteNotifier {
     String body, {
     int? categoryId,
   }) async {
-    try {
-      final updated = await _noteService.updateNote(
-        id,
-        title,
-        body,
-        categoryId: categoryId,
-      );
-      final notes = [...state.notes];
-      final index = notes.indexWhere((n) => n.id == id);
+    final updated = await _noteService.updateNote(
+      id,
+      title,
+      body,
+      categoryId: categoryId,
+    );
+    final notes = [...state.notes];
+    final index = notes.indexWhere((n) => n.id == id);
 
-      if (index != -1) {
-        notes[index] = updated;
-        _sortNotes(notes);
-        state = state.copyWith(notes: notes);
-      }
-    } catch (e) {
-      print('updateNote error: $e');
+    if (index != -1) {
+      notes[index] = updated;
+      _sortNotes(notes);
+      state = state.copyWith(notes: notes);
     }
   }
 
   Future<void> deleteNote(String id) async {
-    try {
-      await _noteService.deleteNote(id);
-      final notes = state.notes.where((n) => n.id != id).toList();
-      state = state.copyWith(notes: notes);
-    } catch (e) {
-      print('deleteNote error: $e');
-    }
+    await _noteService.deleteNote(id);
+    final notes = state.notes.where((n) => n.id != id).toList();
+    state = state.copyWith(notes: notes);
   }
 
   void _sortNotes(List<Note> notes) {
