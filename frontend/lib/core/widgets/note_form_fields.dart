@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/category.dart';
+import '../../features/notes/models/category.dart';
 
 class NoteFormFields extends StatelessWidget {
   final TextEditingController titleController;

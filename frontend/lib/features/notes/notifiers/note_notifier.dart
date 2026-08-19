@@ -1,6 +1,6 @@
-import 'package:frontend/providers/auth_provider.dart';
-import 'package:frontend/services/note_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../providers/auth_provider.dart';
+import '../services/note_service.dart';
 import '../models/category.dart';
 import '../models/note.dart';
 

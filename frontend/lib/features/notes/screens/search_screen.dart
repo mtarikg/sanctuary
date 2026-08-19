@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/notifiers/note_notifier.dart';
-import 'package:frontend/utils/note_utils.dart';
-import 'package:frontend/widgets/note_card.dart';
+import '../notifiers/note_notifier.dart';
+import '../../../core/utils/note_utils.dart';
+import '../../../core/widgets/note_card.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});

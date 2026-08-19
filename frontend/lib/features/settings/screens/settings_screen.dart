@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/providers/auth_provider.dart';
-import 'package:frontend/services/auth_service.dart';
+import '../../../providers/auth_provider.dart';
+import '../../auth/services/auth_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

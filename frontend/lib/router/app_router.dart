@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/main.dart';
-import 'package:frontend/models/note.dart';
-import 'package:frontend/providers/auth_provider.dart';
-import 'package:frontend/screens/auth_screen.dart';
-import 'package:frontend/screens/favorites_screen.dart';
-import 'package:frontend/screens/home_screen.dart';
-import 'package:frontend/screens/note_detail_screen.dart';
-import 'package:frontend/screens/note_form_screen.dart';
-import 'package:frontend/screens/search_screen.dart';
-import 'package:frontend/screens/settings_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../main.dart';
+import '../features/notes/models/note.dart';
+import '../providers/auth_provider.dart';
+import '../features/auth/screens/auth_screen.dart';
+import '../features/notes/screens/favorites_screen.dart';
+import '../features/notes/screens/home_screen.dart';
+import '../features/notes/screens/note_detail_screen.dart';
+import '../features/notes/screens/note_form_screen.dart';
+import '../features/notes/screens/search_screen.dart';
+import '../features/settings/screens/settings_screen.dart';
 
 part 'app_router.g.dart';
 

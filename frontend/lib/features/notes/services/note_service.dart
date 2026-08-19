@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:frontend/constants/constants.dart';
-import 'package:frontend/models/category.dart';
-import 'package:frontend/models/note.dart';
 import 'package:http/http.dart' as http;
+import '../../../core/constants/constants.dart';
+import '../models/category.dart';
+import '../models/note.dart';
 
 class NoteService {
   final String token;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/providers/auth_provider.dart';
-import 'package:frontend/services/auth_service.dart';
-import 'package:frontend/utils/validators.dart';
-import 'package:frontend/widgets/primary_button.dart';
+import '../../../providers/auth_provider.dart';
+import '../services/auth_service.dart';
+import '../../../core/utils/validators.dart';
+import '../../../core/widgets/primary_button.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});

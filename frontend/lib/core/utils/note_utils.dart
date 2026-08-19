@@ -1,4 +1,4 @@
-import 'package:frontend/models/note.dart';
+import '../../features/notes/models/note.dart';
 
 List<Note> filterNotes(List<Note> notes, String query) {
   final q = query.toLowerCase().trim();

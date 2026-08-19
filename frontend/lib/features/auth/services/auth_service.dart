@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/constants/constants.dart';
 import 'package:http/http.dart' as http;
+import '../../../core/constants/constants.dart';
 
 class AuthResult {
   final String? token;

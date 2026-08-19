@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/category.dart';
-import 'package:frontend/models/note.dart';
-import 'package:frontend/notifiers/note_notifier.dart';
-import 'package:frontend/widgets/note_form_fields.dart';
 import 'package:go_router/go_router.dart';
+import '../models/category.dart';
+import '../models/note.dart';
+import '../notifiers/note_notifier.dart';
+import '../../../core/widgets/note_form_fields.dart';
 
 class NoteDetailScreen extends ConsumerStatefulWidget {
   final Note note;

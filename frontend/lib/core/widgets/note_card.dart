@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/note.dart';
-import 'package:frontend/screens/note_detail_screen.dart';
-import 'package:frontend/utils/date_formatter.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/notes/models/note.dart';
+import '../utils/date_formatter.dart';
 
 class NoteCard extends StatelessWidget {
   final Note note;

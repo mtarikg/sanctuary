@@ -1,4 +1,4 @@
-import 'package:frontend/models/category.dart';
+import 'category.dart';
 
 class Note {
   final String id;
