@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/models/note.dart';
 import 'package:frontend/screens/note_detail_screen.dart';
 import 'package:frontend/utils/date_formatter.dart';
+import 'package:go_router/go_router.dart';
 
 class NoteCard extends StatelessWidget {
   final Note note;
@@ -20,10 +21,7 @@ class NoteCard extends StatelessWidget {
       color: Theme.of(context).colorScheme.onPrimary,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
-        ),
+        onTap: () => context.push('/home/note/${note.id}', extra: note),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Column(

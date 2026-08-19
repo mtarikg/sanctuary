@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/widgets/note_card.dart';
+import 'package:go_router/go_router.dart';
 import '../notifiers/note_notifier.dart';
 import '../screens/note_form_screen.dart';
 import '../screens/settings_screen.dart';
@@ -19,20 +20,14 @@ class HomeScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: FloatingActionButton.small(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => NoteFormScreen()),
-              ),
+              onPressed: () => context.push('/home/note/add'),
               child: const Icon(Icons.add),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: IconButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SettingsScreen()),
-              ),
+              onPressed: () => context.push('/settings'),
               icon: const Icon(Icons.settings_outlined),
             ),
           ),

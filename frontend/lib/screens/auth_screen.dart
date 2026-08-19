@@ -174,7 +174,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ),
               ],
               const SizedBox(height: 20),
-              PrimaryButton(label: 'Login', onPressed: _submit),
+              PrimaryButton(
+                label: _isLogin ? 'Login' : 'Register',
+                onPressed: _submit,
+              ),
               const SizedBox(height: 16),
               Center(
                 child: TextButton(

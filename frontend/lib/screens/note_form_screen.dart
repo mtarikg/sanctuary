@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
 import 'package:frontend/widgets/note_form_fields.dart';
+import 'package:go_router/go_router.dart';
 import '../models/category.dart';
 
 class NoteFormScreen extends ConsumerStatefulWidget {
@@ -38,7 +39,7 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
           categoryId: _selectedCategory?.id,
         );
 
-    if (mounted) Navigator.pop(context);
+    if (mounted) context.pop();
   }
 
   @override

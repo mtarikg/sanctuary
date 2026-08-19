@@ -4,6 +4,7 @@ import 'package:frontend/models/category.dart';
 import 'package:frontend/models/note.dart';
 import 'package:frontend/notifiers/note_notifier.dart';
 import 'package:frontend/widgets/note_form_fields.dart';
+import 'package:go_router/go_router.dart';
 
 class NoteDetailScreen extends ConsumerStatefulWidget {
   final Note note;
@@ -56,22 +57,22 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
           categoryId: _selectedCategory?.id,
         );
 
-    if (mounted) Navigator.pop(context);
+    if (mounted) context.pop();
   }
 
   Future<void> _delete() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Note'),
         content: const Text('This cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
@@ -80,7 +81,7 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
 
     if (confirm == true && mounted) {
       await ref.read(noteNotifierProvider.notifier).deleteNote(widget.note.id);
-      if (mounted) Navigator.pop(context);
+      if (mounted) context.pop();
     }
   }
 
