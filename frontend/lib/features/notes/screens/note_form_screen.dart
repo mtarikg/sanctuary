@@ -17,6 +17,7 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
   final _bodyController = TextEditingController();
   Category? _selectedCategory;
   String? _error;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -31,6 +32,8 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
       return;
     }
 
+    setState(() => _isLoading = true);
+
     try {
       await ref
           .read(noteNotifierProvider.notifier)
@@ -42,7 +45,10 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
 
       if (mounted) context.pop();
     } catch (e) {
-      setState(() => _error = 'Failed to add note. Try again.');
+      setState(() {
+        _error = 'Failed to add note. Try again.';
+        _isLoading = false;
+      });
     }
   }
 
@@ -57,14 +63,23 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: FilledButton(
-              onPressed: _submit,
+              onPressed: _isLoading ? null : _submit,
               style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('Save'),
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Add'),
             ),
           ),
         ],

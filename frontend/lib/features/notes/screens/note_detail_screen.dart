@@ -21,6 +21,7 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
   late TextEditingController _titleController;
   late TextEditingController _bodyController;
   String? _error;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -48,6 +49,8 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
       return;
     }
 
+    setState(() => _isLoading = true);
+
     try {
       await ref
           .read(noteNotifierProvider.notifier)
@@ -60,7 +63,10 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
 
       if (mounted) context.pop();
     } catch (e) {
-      setState(() => _error = 'Failed to save note. Try again.');
+      setState(() {
+        _error = 'Failed to save note. Try again.';
+        _isLoading = false;
+      });
     }
   }
 
@@ -112,20 +118,29 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.delete_outline),
-              onPressed: _delete,
+              onPressed: _isLoading ? null : _delete,
             ),
           ] else
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: FilledButton(
-                onPressed: _save,
+                onPressed: _isLoading ? null : _save,
                 style: FilledButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text('Save'),
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text('Save'),
               ),
             ),
         ],
