@@ -25,7 +25,7 @@ class NoteFormFields extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         DropdownButtonFormField<Category>(
-          value: selectedCategory,
+          initialValue: selectedCategory,
           hint: const Text('Category (optional)'),
           items: categories
               .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
