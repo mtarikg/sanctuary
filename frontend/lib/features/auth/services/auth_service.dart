@@ -1,35 +1,30 @@
-import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:frontend/core/network/dio_client.dart';
 import 'package:frontend/core/utils/error_mapper.dart';
 import 'package:frontend/features/auth/models/auth_result.dart';
-import 'package:http/http.dart' as http;
+import 'package:frontend/features/auth/models/login_request.dart';
+import 'package:frontend/features/auth/models/register_request.dart';
 import '../../../core/constants/constants.dart';
 
 class AuthService {
   static const _storage = FlutterSecureStorage();
+  final Dio _dio = DioClient.instance.dio;
 
   Future<AuthResult> login(String email, String password) async {
     try {
-      final requestBody = {'email': email, 'password': password};
-
-      final response = await http.post(
-        Uri.parse('${AppConstants.baseUrl}/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(requestBody),
+      final response = await _dio.post(
+        '/auth/login',
+        data: LoginRequest(email: email, password: password).toJson(),
       );
 
-      if (response.statusCode == 200) {
-        final token = jsonDecode(response.body)['token'] as String;
-        return AuthResult.success(token);
-      } else if (response.statusCode == 401) {
+      final token = response.data['token'] as String;
+      return AuthResult.success(token);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
         return const AuthResult.failure('Incorrect email or password.');
-      } else {
-        final body = response.body;
-        final message = body.isNotEmpty
-            ? jsonDecode(body)['errors']?.toString() ?? 'Something went wrong.'
-            : 'Something went wrong.';
-        return AuthResult.failure(message);
       }
+      return AuthResult.failure(mapError(e.error ?? e));
     } catch (e) {
       return AuthResult.failure(mapError(e));
     }
@@ -41,26 +36,19 @@ class AuthService {
     String password,
   ) async {
     try {
-      final response = await http.post(
-        Uri.parse('${AppConstants.baseUrl}/auth/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'username': username,
-          'email': email,
-          'password': password,
-        }),
+      final response = await _dio.post(
+        '/auth/register',
+        data: RegisterRequest(
+          username: username,
+          email: email,
+          password: password,
+        ).toJson(),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final token = jsonDecode(response.body)['token'] as String;
-        return AuthResult.success(token);
-      } else {
-        final body = response.body;
-        final message = body.isNotEmpty
-            ? jsonDecode(body)['errors']?.toString() ?? 'Something went wrong.'
-            : 'Something went wrong.';
-        return AuthResult.failure(message);
-      }
+      final token = response.data['token'] as String;
+      return AuthResult.success(token);
+    } on DioException catch (e) {
+      return AuthResult.failure(mapError(e.error ?? e));
     } catch (e) {
       return AuthResult.failure(mapError(e));
     }
