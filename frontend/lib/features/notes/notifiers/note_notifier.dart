@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:frontend/core/utils/error_mapper.dart';
+import 'package:frontend/features/notes/services/category_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../providers/auth_provider.dart';
 import '../services/note_service.dart';
 import '../models/category.dart';
 import '../models/note.dart';
@@ -21,12 +21,13 @@ class NoteState with _$NoteState {
 
 @riverpod
 class NoteNotifier extends _$NoteNotifier {
+  late CategoryService _categoryService;
   late NoteService _noteService;
 
   @override
   NoteState build() {
-    final token = ref.read(authTokenProvider) ?? '';
-    _noteService = NoteService(token);
+    _categoryService = CategoryService();
+    _noteService = NoteService();
     Future.microtask(() async {
       await fetchCategories();
       await fetchNotes();
@@ -38,7 +39,7 @@ class NoteNotifier extends _$NoteNotifier {
     state = state.copyWith(loading: true, error: null);
 
     try {
-      final categories = await _noteService.fetchCategories();
+      final categories = await _categoryService.fetchCategories();
       state = state.copyWith(categories: categories, loading: false);
     } catch (e) {
       state = state.copyWith(loading: false, error: mapError(e));
