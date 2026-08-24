@@ -1,43 +1,22 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:frontend/core/utils/error_mapper.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../providers/auth_provider.dart';
 import '../services/note_service.dart';
 import '../models/category.dart';
 import '../models/note.dart';
 
+part 'note_notifier.freezed.dart';
 part 'note_notifier.g.dart';
 
-class NoteState {
-  final List<Category> categories;
-  final List<Note> notes;
-  final bool loading;
-  final String? error;
-
-  const NoteState({
-    this.categories = const [],
-    this.notes = const [],
-    this.loading = false,
-    this.error,
-  });
-
-  NoteState copyWith({
-    List<Category>? categories,
-    List<Note>? notes,
-    bool? loading,
+@freezed
+class NoteState with _$NoteState {
+  const factory NoteState({
+    @Default([]) List<Category> categories,
+    @Default([]) List<Note> notes,
+    @Default(false) bool loading,
     String? error,
-  }) {
-    return NoteState(
-      categories: categories ?? this.categories,
-      notes: notes ?? this.notes,
-      loading: loading ?? this.loading,
-      error: error ?? this.error,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) => false;
-
-  @override
-  int get hashCode => Object.hash(categories, notes, loading, error);
+  }) = _NoteState;
 }
 
 @riverpod
@@ -48,34 +27,32 @@ class NoteNotifier extends _$NoteNotifier {
   NoteState build() {
     final token = ref.read(authTokenProvider) ?? '';
     _noteService = NoteService(token);
-    Future.microtask(() => fetchAll());
+    Future.microtask(() async {
+      await fetchCategories();
+      await fetchNotes();
+    });
     return const NoteState();
   }
 
-  Future<void> fetchAll() async {
+  Future<void> fetchCategories() async {
     state = state.copyWith(loading: true, error: null);
 
     try {
-      final results = await Future.wait([
-        _noteService.fetchCategories(),
-        _noteService.fetchNotes(),
-      ]);
-
-      final categories = results[0] as List<Category>;
-      final notes = results[1] as List<Note>;
-
-      _sortNotes(notes);
-
-      state = state.copyWith(
-        categories: categories,
-        notes: notes,
-        loading: false,
-      );
+      final categories = await _noteService.fetchCategories();
+      state = state.copyWith(categories: categories, loading: false);
     } catch (e) {
-      state = state.copyWith(
-        loading: false,
-        error: 'Could not reach the server.',
-      );
+      state = state.copyWith(loading: false, error: mapError(e));
+    }
+  }
+
+  Future<void> fetchNotes() async {
+    state = state.copyWith(loading: true, error: null);
+    try {
+      final notes = await _noteService.fetchNotes();
+      _sortNotes(notes);
+      state = state.copyWith(notes: notes, loading: false);
+    } catch (e) {
+      state = state.copyWith(loading: false, error: mapError(e));
     }
   }
 

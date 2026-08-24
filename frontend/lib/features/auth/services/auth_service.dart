@@ -1,16 +1,9 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:frontend/core/utils/error_mapper.dart';
+import 'package:frontend/features/auth/models/auth_result.dart';
 import 'package:http/http.dart' as http;
 import '../../../core/constants/constants.dart';
-
-class AuthResult {
-  final String? token;
-  final String? error;
-
-  const AuthResult({this.token, this.error});
-
-  bool get isSuccess => token != null;
-}
 
 class AuthService {
   static const _storage = FlutterSecureStorage();
@@ -27,18 +20,18 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final token = jsonDecode(response.body)['token'] as String;
-        return AuthResult(token: token);
+        return AuthResult.success(token);
       } else if (response.statusCode == 401) {
-        return const AuthResult(error: 'Incorrect email or password.');
+        return const AuthResult.failure('Incorrect email or password.');
       } else {
         final body = response.body;
         final message = body.isNotEmpty
             ? jsonDecode(body)['errors']?.toString() ?? 'Something went wrong.'
             : 'Something went wrong.';
-        return AuthResult(error: message);
+        return AuthResult.failure(message);
       }
     } catch (e) {
-      return const AuthResult(error: 'Could not reach the server.');
+      return AuthResult.failure(mapError(e));
     }
   }
 
@@ -60,16 +53,16 @@ class AuthService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final token = jsonDecode(response.body)['token'] as String;
-        return AuthResult(token: token);
+        return AuthResult.success(token);
       } else {
         final body = response.body;
         final message = body.isNotEmpty
             ? jsonDecode(body)['errors']?.toString() ?? 'Something went wrong.'
             : 'Something went wrong.';
-        return AuthResult(error: message);
+        return AuthResult.failure(message);
       }
     } catch (e) {
-      return const AuthResult(error: 'Could not reach the server.');
+      return AuthResult.failure(mapError(e));
     }
   }
 
