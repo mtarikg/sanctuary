@@ -112,7 +112,8 @@ node_modules/
 Thumbs.db
 
 # VS Code (optional)
-.vscode/
+.vscode/*
+!.vscode/launch.json
 *.code-workspace
 
 # Environment and config files
