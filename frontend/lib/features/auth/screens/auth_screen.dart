@@ -4,6 +4,7 @@ import '../../../providers/auth_provider.dart';
 import '../services/auth_service.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/primary_button.dart';
+import '../models/auth_result.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -71,11 +72,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             _passwordController.text,
           );
 
-    if (result.isSuccess) {
-      await authService.saveToken(result.token!);
-      ref.read(authTokenProvider.notifier).state = result.token;
-    } else {
-      setState(() => _errorMessage = result.error);
+    switch (result) {
+      case AuthSuccess(:final token):
+        await authService.saveToken(token);
+        ref.read(authTokenProvider.notifier).state = token;
+        break;
+      case AuthFailure(:final error):
+        setState(() => _errorMessage = error);
     }
   }
 
