@@ -65,6 +65,8 @@ public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, I
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
-        return new AuthResponse { UserId = user.Id, Username = user.Username };
+        var token = GenerateToken(user);
+
+        return new AuthResponse { UserId = user.Id, Username = user.Username, Token = token };
     }
 }
