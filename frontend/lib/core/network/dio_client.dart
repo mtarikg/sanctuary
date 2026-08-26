@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/core/constants/constants.dart';
-import 'package:frontend/core/utils/api_exception.dart';
+import '../constants/constants.dart';
+import 'secure_storage.dart';
+import '../utils/api_exception.dart';
 
 class DioClient {
   DioClient._();
@@ -29,7 +29,7 @@ class DioClient {
 }
 
 class _AuthInterceptor extends Interceptor {
-  static const _storage = FlutterSecureStorage();
+  final _storage = SecureStorage.instance;
 
   @override
   Future<void> onRequest(

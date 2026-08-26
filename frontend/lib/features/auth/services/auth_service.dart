@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/core/network/dio_client.dart';
-import 'package:frontend/features/auth/models/auth_response.dart';
-import 'package:frontend/features/auth/models/login_request.dart';
-import 'package:frontend/features/auth/models/register_request.dart';
+import '../../../core/network/dio_client.dart';
+import '../models/auth_response.dart';
+import '../models/login_request.dart';
+import '../models/register_request.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/network/secure_storage.dart';
 
 class AuthService {
-  static const _storage = FlutterSecureStorage();
+  final _storage = SecureStorage.instance;
   final Dio _dio = DioClient.instance.dio;
 
   Future<AuthResponse> login(String email, String password) async {
