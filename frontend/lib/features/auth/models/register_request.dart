@@ -9,7 +9,7 @@ class RegisterRequest {
     required this.password,
   });
   Map<String, dynamic> toJson() => {
-    'username:': username,
+    'username': username,
     'email': email,
     'password': password,
   };

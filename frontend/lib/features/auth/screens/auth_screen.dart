@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../providers/auth_provider.dart';
-import '../services/auth_service.dart';
+import '../../../core/utils/error_mapper.dart';
+import '../notifiers/auth_notifier.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/primary_button.dart';
-import '../models/auth_result.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -45,8 +44,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   Future<void> _submit() async {
-    setState(() => _errorMessage = null);
-
     final error = validateAuthForm(
       isLogin: _isLogin,
       username: _usernameController.text,
@@ -60,25 +57,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       return;
     }
 
-    final authService = AuthService();
-    final result = _isLogin
-        ? await authService.login(
-            _emailController.text.trim(),
-            _passwordController.text,
-          )
-        : await authService.register(
-            _usernameController.text.trim(),
-            _emailController.text.trim(),
-            _passwordController.text,
-          );
+    final notifier = ref.read(authNotifierProvider.notifier);
 
-    switch (result) {
-      case AuthSuccess(:final token):
-        await authService.saveToken(token);
-        ref.read(authTokenProvider.notifier).state = token;
-        break;
-      case AuthFailure(:final error):
-        setState(() => _errorMessage = error);
+    if (_isLogin) {
+      await notifier.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+    } else {
+      await notifier.register(
+        _usernameController.text.trim(),
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+    }
+
+    final authState = ref.read(authNotifierProvider);
+    if (authState.hasError) {
+      setState(() => _errorMessage = mapError(authState.error!));
     }
   }
 
