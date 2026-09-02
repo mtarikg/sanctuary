@@ -4,9 +4,9 @@ namespace Sanctuary.API.Features.Notes;
 
 public interface INoteService
 {
-    Task<IEnumerable<NoteResponse>> GetAllAsync(int userId);
-    Task<NoteResponse?> GetByIdAsync(int userId, int id);
-    Task<NoteResponse> CreateAsync(int userId, CreateNoteRequest request);
-    Task<NoteResponse?> UpdateAsync(int userId, int id, UpdateNoteRequest request);
-    Task<bool> DeleteAsync(int userId, int id);
+    Task<IEnumerable<NoteResponse>> GetAllAsync(Guid userId);
+    Task<NoteResponse?> GetByIdAsync(Guid userId, Guid id);
+    Task<NoteResponse> CreateAsync(Guid userId, CreateNoteRequest request);
+    Task<NoteResponse?> UpdateAsync(Guid userId, Guid id, UpdateNoteRequest request);
+    Task<bool> DeleteAsync(Guid userId, Guid id);
 }
