@@ -11,17 +11,24 @@ namespace Sanctuary.API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Note>()
-                .HasOne(n => n.User)
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasIndex(u => u.Email).IsUnique();
+                entity.HasIndex(u => u.Username).IsUnique();
+            });
+
+            modelBuilder.Entity<Note>(entity =>
+            {
+                entity.HasOne(n => n.User)
                 .WithMany(u => u.Notes)
                 .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Note>()
-                .HasOne(n => n.Category)
+                entity.HasOne(n => n.Category)
                 .WithMany(c => c.Notes)
                 .HasForeignKey(n => n.CategoryId)
                 .OnDelete(DeleteBehavior.SetNull);
+            });
 
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Personal" },

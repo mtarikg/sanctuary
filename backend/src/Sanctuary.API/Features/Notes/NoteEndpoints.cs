@@ -10,22 +10,23 @@ public static class NoteEndpoints
         var group = app.MapGroup("/notes").RequireAuthorization();
 
         group.MapGet("/", GetAll);
-        group.MapGet("/{id:int}", GetById);
+        group.MapGet("/{id:guid}", GetById);
         group.MapPost("/", Create);
-        group.MapPut("/{id:int}", Update);
-        group.MapDelete("/{id:int}", Delete);
+        group.MapPut("/{id:guid}", Update);
+        group.MapDelete("/{id:guid}", Delete);
 
     }
 
-    private static int GetUserId(HttpContext context) => int.Parse(context.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private static Guid GetUserId(HttpContext context) => Guid.Parse(context.User.FindFirstValue(ClaimTypes.NameIdentifier)
+        ?? throw new InvalidOperationException("User ID claim missing."));
 
-    private static async Task<IResult> Delete(HttpContext context, INoteService noteService, int id)
+    private static async Task<IResult> Delete(HttpContext context, INoteService noteService, Guid id)
     {
         var deleted = await noteService.DeleteAsync(GetUserId(context), id);
         return deleted ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
-    private static async Task<IResult> Update(HttpContext context, INoteService noteService, int id, UpdateNoteRequest request)
+    private static async Task<IResult> Update(HttpContext context, INoteService noteService, Guid id, UpdateNoteRequest request)
     {
         var note = await noteService.UpdateAsync(GetUserId(context), id, request);
         return note is null ? TypedResults.NotFound() : TypedResults.Ok(note);
@@ -37,7 +38,7 @@ public static class NoteEndpoints
         return TypedResults.Created($"/notes/{note.Id}", note);
     }
 
-    private static async Task<IResult> GetById(HttpContext context, INoteService noteService, int id)
+    private static async Task<IResult> GetById(HttpContext context, INoteService noteService, Guid id)
     {
         var note = await noteService.GetByIdAsync(GetUserId(context), id);
         return note is null ? TypedResults.NotFound() : TypedResults.Ok(note);

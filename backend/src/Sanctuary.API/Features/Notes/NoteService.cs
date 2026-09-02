@@ -8,7 +8,7 @@ namespace Sanctuary.API.Features.Notes;
 
 public class NoteService(AppDbContext dbContext) : INoteService
 {
-    public async Task<NoteResponse> CreateAsync(int userId, CreateNoteRequest request)
+    public async Task<NoteResponse> CreateAsync(Guid userId, CreateNoteRequest request)
     {
         var note = new Note
         {
@@ -29,7 +29,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
         return ToResponse(note);
     }
 
-    public async Task<bool> DeleteAsync(int userId, int id)
+    public async Task<bool> DeleteAsync(Guid userId, Guid id)
     {
         var note = await dbContext.Notes
             .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id);
@@ -42,7 +42,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
         return true;
     }
 
-    public async Task<IEnumerable<NoteResponse>> GetAllAsync(int userId)
+    public async Task<IEnumerable<NoteResponse>> GetAllAsync(Guid userId)
     {
         return await dbContext.Notes
             .Where(n => n.UserId == userId)
@@ -51,7 +51,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
             .ToListAsync();
     }
 
-    public async Task<NoteResponse?> GetByIdAsync(int userId, int id)
+    public async Task<NoteResponse?> GetByIdAsync(Guid userId, Guid id)
     {
         var note = await dbContext.Notes
             .Include(n => n.Category)
@@ -60,7 +60,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
         return note is null ? null : ToResponse(note);
     }
 
-    public async Task<NoteResponse?> UpdateAsync(int userId, int id, UpdateNoteRequest request)
+    public async Task<NoteResponse?> UpdateAsync(Guid userId, Guid id, UpdateNoteRequest request)
     {
         var note = await dbContext.Notes
             .Include(n => n.Category)
@@ -92,7 +92,6 @@ public class NoteService(AppDbContext dbContext) : INoteService
         Body = note.Body,
         CreatedAt = note.CreatedAt,
         UpdatedAt = note.UpdatedAt,
-        UserId = note.UserId,
         Category = note.Category is null ? null : new CategoryResponse
         {
             Id = note.Category.Id,
