@@ -1,4 +1,6 @@
-﻿namespace Sanctuary.API.Features.Auth;
+﻿using Sanctuary.API.Features.Auth.DTOs;
+
+namespace Sanctuary.API.Features.Auth;
 
 public interface IAuthService
 {

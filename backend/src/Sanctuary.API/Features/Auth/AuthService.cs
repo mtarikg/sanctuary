@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Sanctuary.API.Features.Auth;
 
-public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, IOptions<JwtSettings> jwtOptions) : IAuthService
+public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, ITokenService tokenService) : IAuthService
 {
     public async Task<AuthResponse?> LoginAsync(LoginRequest request)
     {
@@ -23,30 +23,7 @@ public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, I
 
         if (result == PasswordVerificationResult.Failed) return null;
 
-        var token = GenerateToken(user);
-
-        return new AuthResponse { UserId = user.Id, Username = user.Username, Token = token };
-    }
-
-    private string GenerateToken(User user)
-    {
-        var jwt = jwtOptions.Value;
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SecretKey));
-
-        var claims = new[] {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username)
-        };
-
-        var token = new JwtSecurityToken(
-            issuer: jwt.Issuer,
-            audience: jwt.Audience,
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(jwt.ExpiryMinutes),
-            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return new AuthResponse { UserId = user.Id, Username = user.Username, Token = tokenService.GenerateToken(user) };
     }
 
     public async Task<AuthResponse?> RegisterAsync(RegisterRequest request)
@@ -68,8 +45,6 @@ public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, I
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
-        var token = GenerateToken(user);
-
-        return new AuthResponse { UserId = user.Id, Username = user.Username, Token = token };
+        return new AuthResponse { UserId = user.Id, Username = user.Username, Token = tokenService.GenerateToken(user) };
     }
 }
