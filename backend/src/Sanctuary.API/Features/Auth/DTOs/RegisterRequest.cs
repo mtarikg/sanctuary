@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sanctuary.API.Features.Auth;
+namespace Sanctuary.API.Features.Auth.DTOs;
 
 public record RegisterRequest
 {

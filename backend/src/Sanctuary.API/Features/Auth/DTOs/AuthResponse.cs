@@ -1,4 +1,4 @@
-﻿namespace Sanctuary.API.Features.Auth;
+﻿namespace Sanctuary.API.Features.Auth.DTOs;
 
 public record AuthResponse
 {

@@ -23,6 +23,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connect
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddTransient<BearerSecuritySchemeTransformer>();
 
@@ -75,11 +76,10 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+    app.MapGet("/test", () => "Hello, World! This is Sanctuary.");
 }
 
 app.UseHttpsRedirection();
-
-app.MapGet("/test", () => "Hello, World! This is Sanctuary.");
 
 app.UseAuthentication();
 app.UseAuthorization();
