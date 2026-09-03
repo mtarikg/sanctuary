@@ -10,12 +10,14 @@ using Sanctuary.API.Features.Auth;
 using Sanctuary.API.Features.Categories;
 using Sanctuary.API.Features.Notes;
 using Sanctuary.API.Infrastructure;
+using Sanctuary.API.Infrastructure.Settings;
 using Scalar.AspNetCore;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is missing.");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -36,20 +38,24 @@ builder.Services.AddProblemDetails(opt =>
 }
 );
 
+builder.Services.AddOptions<JwtSettings>()
+    .BindConfiguration("Jwt").ValidateDataAnnotations().ValidateOnStart();
+
+var jwtSettings = builder.Configuration.GetRequiredSection("Jwt").Get<JwtSettings>()!;
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {
-        var configuration = builder.Configuration;
         opt.TokenValidationParameters = new TokenValidationParameters
         {
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = configuration["Jwt:Issuer"],
-            ValidAudience = configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]!))
         };
     });
 
