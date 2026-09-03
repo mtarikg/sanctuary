@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Sanctuary.API.Data;
+using Sanctuary.API.Infrastructure.Settings;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace Sanctuary.API.Features.Auth;
 
-public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, IConfiguration configuration) : IAuthService
+public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, IOptions<JwtSettings> jwtOptions) : IAuthService
 {
     public async Task<AuthResponse?> LoginAsync(LoginRequest request)
     {
@@ -28,7 +30,8 @@ public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, I
 
     private string GenerateToken(User user)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]!));
+        var jwt = jwtOptions.Value;
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SecretKey));
 
         var claims = new[] {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -36,10 +39,10 @@ public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, I
         };
 
         var token = new JwtSecurityToken(
-            issuer: configuration["Jwt:Issuer"],
-            audience: configuration["Jwt:Audience"],
+            issuer: jwt.Issuer,
+            audience: jwt.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(double.Parse(configuration["Jwt:ExpiryDays"]!)),
+            expires: DateTime.UtcNow.AddMinutes(jwt.ExpiryMinutes),
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
         );
 
