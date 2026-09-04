@@ -1,4 +1,5 @@
 ﻿using Sanctuary.API.Features.Auth.DTOs;
+using Sanctuary.API.Infrastructure.Constants;
 
 namespace Sanctuary.API.Features.Auth;
 
@@ -6,9 +7,9 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/auth");
-        group.MapPost("/register", Register);
-        group.MapPost("/login", Login);
+        var group = app.MapGroup(RouteGroups.Auth).RequireRateLimiting(RateLimitingPolicies.Auth);
+        group.MapPost(AuthRoutes.Register, Register);
+        group.MapPost(AuthRoutes.Login, Login);
     }
 
     private static async Task<IResult> Login(IAuthService authService, LoginRequest request, CancellationToken ct)

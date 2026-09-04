@@ -1,4 +1,5 @@
 ﻿using Sanctuary.API.Features.Notes.DTOs;
+using Sanctuary.API.Infrastructure.Constants;
 using System.Security.Claims;
 
 namespace Sanctuary.API.Features.Notes;
@@ -7,7 +8,7 @@ public static class NoteEndpoints
 {
     public static void MapNoteEndPoints(this WebApplication app)
     {
-        var group = app.MapGroup("/notes").RequireAuthorization();
+        var group = app.MapGroup(RouteGroups.Notes).RequireAuthorization();
 
         group.MapGet("/", GetAll);
         group.MapGet("/{id:guid}", GetById);
