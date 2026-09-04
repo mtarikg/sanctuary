@@ -8,7 +8,7 @@ namespace Sanctuary.API.Features.Notes;
 
 public class NoteService(AppDbContext dbContext) : INoteService
 {
-    public async Task<NoteResponse> CreateAsync(Guid userId, CreateNoteRequest request)
+    public async Task<NoteResponse> CreateAsync(Guid userId, CreateNoteRequest request, CancellationToken ct = default)
     {
         var note = new Note
         {
@@ -20,51 +20,51 @@ public class NoteService(AppDbContext dbContext) : INoteService
         };
 
         dbContext.Notes.Add(note);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(ct);
 
         note = await dbContext.Notes
             .Include(n => n.Category)
-            .FirstAsync(n => n.Id == note.Id);
+            .FirstAsync(n => n.Id == note.Id, ct);
 
         return ToResponse(note);
     }
 
-    public async Task<bool> DeleteAsync(Guid userId, Guid id)
+    public async Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct = default)
     {
         var note = await dbContext.Notes
-            .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id);
+            .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id, ct);
 
         if (note is null) return false;
 
         dbContext.Notes.Remove(note);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(ct);
 
         return true;
     }
 
-    public async Task<IEnumerable<NoteResponse>> GetAllAsync(Guid userId)
+    public async Task<IEnumerable<NoteResponse>> GetAllAsync(Guid userId, CancellationToken ct = default)
     {
         return await dbContext.Notes
             .Where(n => n.UserId == userId)
             .Include(n => n.Category)
             .Select(n => ToResponse(n))
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 
-    public async Task<NoteResponse?> GetByIdAsync(Guid userId, Guid id)
+    public async Task<NoteResponse?> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default)
     {
         var note = await dbContext.Notes
             .Include(n => n.Category)
-            .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id);
+            .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id, ct);
 
         return note is null ? null : ToResponse(note);
     }
 
-    public async Task<NoteResponse?> UpdateAsync(Guid userId, Guid id, UpdateNoteRequest request)
+    public async Task<NoteResponse?> UpdateAsync(Guid userId, Guid id, UpdateNoteRequest request, CancellationToken ct = default)
     {
         var note = await dbContext.Notes
             .Include(n => n.Category)
-            .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id);
+            .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id, ct);
 
         if (note is null) return null;
 
@@ -75,11 +75,11 @@ public class NoteService(AppDbContext dbContext) : INoteService
         note.CategoryId = request.CategoryId;
         note.UpdatedAt = DateTime.UtcNow;
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(ct);
 
         if (categoryChanged)
         {
-            await dbContext.Entry(note).Reference(n => n.Category).LoadAsync();
+            await dbContext.Entry(note).Reference(n => n.Category).LoadAsync(ct);
         }
 
         return ToResponse(note);
