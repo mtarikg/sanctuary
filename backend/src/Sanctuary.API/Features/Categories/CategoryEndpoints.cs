@@ -1,10 +1,12 @@
-﻿namespace Sanctuary.API.Features.Categories;
+﻿using Sanctuary.API.Infrastructure.Constants;
+
+namespace Sanctuary.API.Features.Categories;
 
 public static class CategoryEndpoints
 {
     public static void MapCategoryEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/categories");
+        var group = app.MapGroup(RouteGroups.Categories);
 
         group.MapGet("/", GetAll);
     }

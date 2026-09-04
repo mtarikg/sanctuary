@@ -1,22 +1,21 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.OpenApi;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using Sanctuary.API.Data;
 using Sanctuary.API.Features.Auth;
 using Sanctuary.API.Features.Categories;
 using Sanctuary.API.Features.Notes;
 using Sanctuary.API.Infrastructure;
+using Sanctuary.API.Infrastructure.Constants;
 using Sanctuary.API.Infrastructure.Settings;
 using Scalar.AspNetCore;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+var connectionString = builder.Configuration.GetConnectionString(ConfigurationKeys.DefaultConnectionSection)
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is missing.");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
@@ -40,9 +39,9 @@ builder.Services.AddProblemDetails(opt =>
 );
 
 builder.Services.AddOptions<JwtSettings>()
-    .BindConfiguration("Jwt").ValidateDataAnnotations().ValidateOnStart();
+    .BindConfiguration(ConfigurationKeys.JwtSection).ValidateDataAnnotations().ValidateOnStart();
 
-var jwtSettings = builder.Configuration.GetRequiredSection("Jwt").Get<JwtSettings>()!;
+var jwtSettings = builder.Configuration.GetRequiredSection(ConfigurationKeys.JwtSection).Get<JwtSettings>()!;
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
@@ -61,6 +60,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddRateLimiter(opt =>
+{
+    opt.AddFixedWindowLimiter(RateLimitingPolicies.Auth, o =>
+    {
+        o.PermitLimit = 5;
+        o.Window = TimeSpan.FromMinutes(1);
+    });
+
+    opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -83,6 +93,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapCategoryEndpoints();
 app.MapNoteEndPoints();
