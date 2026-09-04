@@ -4,6 +4,6 @@ namespace Sanctuary.API.Features.Categories;
 
 public interface ICategoryService
 {
-    Task<IEnumerable<CategoryResponse>> GetAllAsync();
+    Task<IEnumerable<CategoryResponse>> GetAllAsync(CancellationToken ct = default);
 
 }

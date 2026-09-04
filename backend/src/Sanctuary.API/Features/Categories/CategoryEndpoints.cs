@@ -9,9 +9,9 @@ public static class CategoryEndpoints
         group.MapGet("/", GetAll);
     }
 
-    private static async Task<IResult> GetAll(ICategoryService categoryService)
+    private static async Task<IResult> GetAll(ICategoryService categoryService, CancellationToken ct)
     {
-        var categories = await categoryService.GetAllAsync();
+        var categories = await categoryService.GetAllAsync(ct);
         return TypedResults.Ok(categories);
     }
 }

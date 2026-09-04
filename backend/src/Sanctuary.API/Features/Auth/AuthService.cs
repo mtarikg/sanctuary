@@ -1,21 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Sanctuary.API.Data;
-using Sanctuary.API.Infrastructure.Settings;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using Sanctuary.API.Features.Auth.DTOs;
 
 namespace Sanctuary.API.Features.Auth;
 
 public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, ITokenService tokenService) : IAuthService
 {
-    public async Task<AuthResponse?> LoginAsync(LoginRequest request)
+    public async Task<AuthResponse?> LoginAsync(LoginRequest request, CancellationToken ct = default)
     {
         var user = await dbContext.Users
-            .FirstOrDefaultAsync(u => u.Email == request.Email);
+            .FirstOrDefaultAsync(u => u.Email == request.Email, ct);
 
         if (user == null) return null;
 
@@ -26,10 +21,10 @@ public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, I
         return new AuthResponse { UserId = user.Id, Username = user.Username, Token = tokenService.GenerateToken(user) };
     }
 
-    public async Task<AuthResponse?> RegisterAsync(RegisterRequest request)
+    public async Task<AuthResponse?> RegisterAsync(RegisterRequest request, CancellationToken ct = default)
     {
         var userExists = await dbContext.Users
-            .AnyAsync(u => u.Email == request.Email);
+            .AnyAsync(u => u.Email == request.Email, ct);
 
         if (userExists) return null;
 
