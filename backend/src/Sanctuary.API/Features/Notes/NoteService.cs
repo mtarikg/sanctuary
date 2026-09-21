@@ -3,6 +3,8 @@ using Sanctuary.API.Data;
 using Sanctuary.API.Entities;
 using Sanctuary.API.Features.Categories.DTOs;
 using Sanctuary.API.Features.Notes.DTOs;
+using Sanctuary.API.Infrastructure.Common;
+using Sanctuary.API.Infrastructure.Constants;
 
 namespace Sanctuary.API.Features.Notes;
 
@@ -26,7 +28,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
             .Include(n => n.Category)
             .FirstAsync(n => n.Id == note.Id, ct);
 
-        return ToResponse(note);
+        return NoteMapper.ToResponse(note);
     }
 
     public async Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct = default)
@@ -42,14 +44,28 @@ public class NoteService(AppDbContext dbContext) : INoteService
         return true;
     }
 
-    public async Task<IEnumerable<NoteResponse>> GetAllAsync(Guid userId, CancellationToken ct = default)
+    public async Task<PagedResult<NoteResponse>> GetAllAsync(Guid userId, PaginationParams pagination, CancellationToken ct = default)
     {
-        return await dbContext.Notes
+        var query = dbContext.Notes
             .AsNoTracking()
-            .Where(n => n.UserId == userId)
+            .Where(n => n.UserId == userId);
+
+        var totalCount = await query.CountAsync(ct);
+
+        var items = await query
             .Include(n => n.Category)
-            .Select(n => ToResponse(n))
+            .OrderByDescending(n => n.CreatedAt)
+            .Skip((pagination.Page - 1) * pagination.PageSize)
+            .Take(pagination.PageSize)
             .ToListAsync(ct);
+
+        return new PagedResult<NoteResponse>
+        {
+            Items = items.Select(NoteMapper.ToResponse),
+            TotalCount = totalCount,
+            Page = pagination.Page,
+            PageSize = pagination.PageSize
+        };
     }
 
     public async Task<NoteResponse?> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default)
@@ -59,7 +75,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
             .Include(n => n.Category)
             .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id, ct);
 
-        return note is null ? null : ToResponse(note);
+        return note is null ? null : NoteMapper.ToResponse(note);
     }
 
     public async Task<NoteResponse?> UpdateAsync(Guid userId, Guid id, UpdateNoteRequest request, CancellationToken ct = default)
@@ -84,20 +100,6 @@ public class NoteService(AppDbContext dbContext) : INoteService
             await dbContext.Entry(note).Reference(n => n.Category).LoadAsync(ct);
         }
 
-        return ToResponse(note);
+        return NoteMapper.ToResponse(note);
     }
-
-    private static NoteResponse ToResponse(Note note) => new()
-    {
-        Id = note.Id,
-        Title = note.Title,
-        Body = note.Body,
-        CreatedAt = note.CreatedAt,
-        UpdatedAt = note.UpdatedAt,
-        Category = note.Category is null ? null : new CategoryResponse
-        {
-            Id = note.Category.Id,
-            Name = note.Category.Name
-        }
-    };
 }
