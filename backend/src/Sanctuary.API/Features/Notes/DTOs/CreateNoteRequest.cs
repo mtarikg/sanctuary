@@ -9,6 +9,7 @@ public record CreateNoteRequest
     public string Title { get; init; } = string.Empty;
 
     [Required(ErrorMessage = "The note body cannot be blank.")]
+    [MaxLength(10000, ErrorMessage = "The note body cannot exceed 10000 characters.")]
     public string Body { get; init; } = string.Empty;
 
     public int? CategoryId { get; init; }
