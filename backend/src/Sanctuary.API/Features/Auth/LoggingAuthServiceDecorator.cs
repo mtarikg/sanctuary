@@ -1,7 +1,6 @@
 ﻿using Sanctuary.API.Features.Auth.DTOs;
 using Sanctuary.API.Infrastructure.Decorators;
-using System.Security.Cryptography;
-using System.Text;
+using Sanctuary.API.Infrastructure.Helpers;
 
 namespace Sanctuary.API.Features.Auth;
 
@@ -25,7 +24,7 @@ public partial class LoggingAuthServiceDecorator(IAuthService inner, ILogger<Log
         return ExecuteWithLoggingAsync(
             () => inner.LoginAsync(request, ct),
             result => LogUserLoggedIn(Logger, result.UserId),
-            () => LogLoginFailed(Logger, HashForLog(request.Email)));
+            () => LogLoginFailed(Logger, LoggingHelpers.HashForLog(request.Email)));
     }
 
     public Task<AuthResponse?> RegisterAsync(RegisterRequest request, CancellationToken ct = default)
@@ -33,12 +32,6 @@ public partial class LoggingAuthServiceDecorator(IAuthService inner, ILogger<Log
         return ExecuteWithLoggingAsync(
             () => inner.RegisterAsync(request, ct),
             result => LogUserRegistered(Logger, result.UserId),
-            () => LogRegistrationFailed(Logger, HashForLog(request.Email)));
-    }
-
-    private static string HashForLog(string value)
-    {
-        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
-        return Convert.ToHexString(bytes)[..8];
+            () => LogRegistrationFailed(Logger, LoggingHelpers.HashForLog(request.Email)));
     }
 }
