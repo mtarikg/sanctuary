@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Sanctuary.API.Data;
@@ -25,9 +26,9 @@ builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IAuthService, LoggingAuthServiceDecorator>(sp => 
+builder.Services.AddScoped<IAuthService, LoggingAuthServiceDecorator>(sp =>
     new LoggingAuthServiceDecorator(
-        sp.GetRequiredService<AuthService>(), 
+        sp.GetRequiredService<AuthService>(),
         sp.GetRequiredService<ILogger<LoggingAuthServiceDecorator>>()));
 builder.Services.AddTransient<BearerSecuritySchemeTransformer>();
 
@@ -67,6 +68,11 @@ builder.Services.AddRateLimiter(opt =>
     });
 
     opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
+builder.Services.Configure<KestrelServerLimits>(opt =>
+{
+    opt.MaxRequestBodySize = 1_048_576; // 1MB
 });
 
 // Add services to the container.
