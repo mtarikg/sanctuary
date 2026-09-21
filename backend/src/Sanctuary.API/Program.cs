@@ -9,6 +9,7 @@ using Sanctuary.API.Features.Categories;
 using Sanctuary.API.Features.Notes;
 using Sanctuary.API.Infrastructure;
 using Sanctuary.API.Infrastructure.Constants;
+using Sanctuary.API.Infrastructure.Extensions;
 using Sanctuary.API.Infrastructure.Settings;
 using Scalar.AspNetCore;
 using System.Text;
@@ -24,19 +25,15 @@ builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, LoggingAuthServiceDecorator>(sp => 
+    new LoggingAuthServiceDecorator(
+        sp.GetRequiredService<AuthService>(), 
+        sp.GetRequiredService<ILogger<LoggingAuthServiceDecorator>>()));
 builder.Services.AddTransient<BearerSecuritySchemeTransformer>();
 
 builder.Services.AddValidation();
 
-builder.Services.AddProblemDetails(opt =>
-{
-    opt.CustomizeProblemDetails = context =>
-    {
-        if (context.ProblemDetails.Status == StatusCodes.Status400BadRequest)
-            context.ProblemDetails.Title = "Please complete all required fields.";
-    };
-}
-);
+builder.Services.AddProblemDetailsConfiguration();
 
 builder.Services.AddOptions<JwtSettings>()
     .BindConfiguration(ConfigurationKeys.JwtSection).ValidateDataAnnotations().ValidateOnStart();
@@ -90,6 +87,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
