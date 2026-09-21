@@ -10,6 +10,7 @@ public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, I
     public async Task<AuthResponse?> LoginAsync(LoginRequest request, CancellationToken ct = default)
     {
         var user = await dbContext.Users
+            .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email == request.Email, ct);
 
         if (user == null) return null;
@@ -24,6 +25,7 @@ public class AuthService(AppDbContext dbContext, IPasswordHasher<User> hasher, I
     public async Task<AuthResponse?> RegisterAsync(RegisterRequest request, CancellationToken ct = default)
     {
         var userExists = await dbContext.Users
+            .AsNoTracking()
             .AnyAsync(u => u.Email == request.Email, ct);
 
         if (userExists) return null;

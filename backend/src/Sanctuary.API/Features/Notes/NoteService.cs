@@ -45,6 +45,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
     public async Task<IEnumerable<NoteResponse>> GetAllAsync(Guid userId, CancellationToken ct = default)
     {
         return await dbContext.Notes
+            .AsNoTracking()
             .Where(n => n.UserId == userId)
             .Include(n => n.Category)
             .Select(n => ToResponse(n))
@@ -54,6 +55,7 @@ public class NoteService(AppDbContext dbContext) : INoteService
     public async Task<NoteResponse?> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default)
     {
         var note = await dbContext.Notes
+            .AsNoTracking()
             .Include(n => n.Category)
             .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id, ct);
 
