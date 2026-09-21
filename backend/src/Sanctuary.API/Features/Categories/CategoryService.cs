@@ -9,6 +9,7 @@ public class CategoryService(AppDbContext dbContext) : ICategoryService
     public async Task<IEnumerable<CategoryResponse>> GetAllAsync(CancellationToken ct = default)
     {
         return await dbContext.Categories
+            .AsNoTracking()
             .Select(c => new CategoryResponse
             {
                 Id = c.Id,
