@@ -1,4 +1,6 @@
-﻿using Sanctuary.API.Features.Notes.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
+using Sanctuary.API.Features.Notes.DTOs;
+using Sanctuary.API.Infrastructure.Common;
 using Sanctuary.API.Infrastructure.Constants;
 using Sanctuary.API.Infrastructure.Extensions;
 
@@ -42,9 +44,10 @@ public static class NoteEndpoints
         return note is null ? TypedResults.NotFound() : TypedResults.Ok(note);
     }
 
-    private static async Task<IResult> GetAll(HttpContext context, INoteService noteService, CancellationToken ct)
+    private static async Task<IResult> GetAll(HttpContext context, INoteService noteService,
+        [AsParameters] PaginationParams pagination, CancellationToken ct)
     {
-        var notes = await noteService.GetAllAsync(context.User.GetUserId(), ct);
+        var notes = await noteService.GetAllAsync(context.User.GetUserId(), pagination, ct);
         return TypedResults.Ok(notes);
     }
 }
