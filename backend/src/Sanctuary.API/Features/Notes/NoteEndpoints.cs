@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Sanctuary.API.Features.Notes.DTOs;
+﻿using Sanctuary.API.Features.Notes.DTOs;
 using Sanctuary.API.Infrastructure.Common;
 using Sanctuary.API.Infrastructure.Constants;
 using Sanctuary.API.Infrastructure.Extensions;
@@ -10,14 +9,40 @@ public static class NoteEndpoints
 {
     public static void MapNoteEndPoints(this WebApplication app)
     {
-        var group = app.MapGroup(RouteGroups.Notes).RequireAuthorization();
+        var group = app.MapGroup(RouteGroups.Notes)
+            .RequireAuthorization()
+            .WithTags(OpenApiTags.Notes);
 
-        group.MapGet("/", GetAll);
-        group.MapGet("/{id:guid}", GetById);
-        group.MapPost("/", Create);
-        group.MapPut("/{id:guid}", Update);
-        group.MapDelete("/{id:guid}", Delete);
+        group.MapGet("/", GetAll)
+            .WithSummary("Get all notes for the authenticated user")
+            .WithDescription("Returns a paginated list of notes. Supports page and pageSize query parameters.")
+            .Produces<PagedResult<NoteResponse>>()
+            .Produces(StatusCodes.Status401Unauthorized);
 
+        group.MapGet("/{id:guid}", GetById)
+            .WithSummary("Get a note by its ID")
+            .Produces<NoteResponse>()
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound);
+
+        group.MapPost("/", Create)
+            .WithSummary("Create a new note")
+            .Produces<NoteResponse>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+
+        group.MapPut("/{id:guid}", Update)
+            .WithSummary("Update an existing note")
+            .Produces<NoteResponse>()
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound);
+
+        group.MapDelete("/{id:guid}", Delete)
+            .WithSummary("Delete a note")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> Delete(HttpContext context, INoteService noteService, Guid id, CancellationToken ct)

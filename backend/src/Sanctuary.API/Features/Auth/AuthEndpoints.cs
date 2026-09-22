@@ -7,9 +7,23 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup(RouteGroups.Auth).RequireRateLimiting(RateLimitingPolicies.Auth);
-        group.MapPost(AuthRoutes.Register, Register);
-        group.MapPost(AuthRoutes.Login, Login);
+        var group = app.MapGroup(RouteGroups.Auth)
+            .RequireRateLimiting(RateLimitingPolicies.Auth)
+            .WithTags(OpenApiTags.Auth);
+
+        group.MapPost(AuthRoutes.Register, Register)
+            .WithSummary("Register a new user")
+            .Produces<AuthResponse>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
+            .Produces(StatusCodes.Status429TooManyRequests);
+
+        group.MapPost(AuthRoutes.Login, Login)
+            .WithSummary("Authenticate and receive a JWT token")
+            .Produces<AuthResponse>()
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status429TooManyRequests);
     }
 
     private static async Task<IResult> Login(IAuthService authService, LoginRequest request, CancellationToken ct)
