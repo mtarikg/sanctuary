@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Sanctuary.API/Sanctuary.API.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Sanctuary.UnitTests/Sanctuary.UnitTests.csproj" Id="6b106a31-91ca-463c-b912-c2cc50d60c2f" />
+  </Folder>
 </Solution>
