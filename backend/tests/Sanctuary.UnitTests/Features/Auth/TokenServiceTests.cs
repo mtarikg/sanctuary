@@ -7,6 +7,7 @@ using System.Security.Claims;
 
 namespace Sanctuary.UnitTests.Features.Auth;
 
+[Trait("Category", "Unit")]
 public class TokenServiceTests
 {
     private readonly JwtSettings _jwtSettings = new()

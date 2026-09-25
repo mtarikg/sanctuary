@@ -12,6 +12,7 @@ namespace Sanctuary.UnitTests.Features.Notes;
 // In-memory EF does not support navigation reference loading.
 // Covered in integration tests.
 
+[Trait("Category", "Unit")]
 public class NoteServiceTests
 {
     private static AppDbContext CreateDbContext()

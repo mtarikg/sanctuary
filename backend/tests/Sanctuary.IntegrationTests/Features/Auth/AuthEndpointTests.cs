@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 
 namespace Sanctuary.IntegrationTests.Features.Auth;
 
+[Trait("Category", "Integration")]
 public class AuthEndpointTests : IntegrationTestBase
 {
     private static readonly object ValidRegisterRequest = new
