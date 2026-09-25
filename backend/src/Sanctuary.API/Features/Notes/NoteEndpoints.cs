@@ -70,7 +70,7 @@ public static class NoteEndpoints
     }
 
     private static async Task<IResult> GetAll(HttpContext context, INoteService noteService,
-        [AsParameters] PaginationParams pagination, CancellationToken ct)
+        PaginationParams pagination, CancellationToken ct)
     {
         var notes = await noteService.GetAllAsync(context.User.GetUserId(), pagination, ct);
         return TypedResults.Ok(notes);
