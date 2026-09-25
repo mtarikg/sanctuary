@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Sanctuary.API.Features.Categories.DTOs;
 using Sanctuary.API.Features.Notes.DTOs;
 using Sanctuary.API.Infrastructure.Common;
 using System.Net;
@@ -59,19 +60,24 @@ public class NoteEndpointTests : IntegrationTestBase
         body.TotalCount.Should().Be(0);
     }
 
-    [Fact]
-    public async Task GetAll_WithNotes_Returns200WithPagedResult()
+    [Theory]
+    [InlineData(1, 2, 2, 3)]
+    [InlineData(2, 2, 1, 3)]
+    [InlineData(1, 3, 3, 3)]
+    public async Task GetAll_ReturnsPaginatedResult(int page, int pageSize, int expectedCount, int totalCount)
     {
         var client = await CreateAuthenticatedClientAsync();
-        await client.PostAsJsonAsync("/notes", ValidCreateRequest, CancellationToken.None);
-        await client.PostAsJsonAsync("/notes", ValidCreateRequest, CancellationToken.None);
+        for (int i = 0; i < totalCount; i++)
+        {
+            await client.PostAsJsonAsync("/notes", ValidCreateRequest, CancellationToken.None);
+        }
 
-        var response = await client.GetAsync("/notes", CancellationToken.None);
+        var response = await client.GetAsync($"/notes?page={page}&pageSize={pageSize}", CancellationToken.None);
         var body = await response.Content.ReadFromJsonAsync<PagedResult<NoteResponse>>(CancellationToken.None);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        body!.TotalCount.Should().Be(2);
-        body.Items.Should().HaveCount(2);
+        body!.TotalCount.Should().Be(totalCount);
+        body.Items.Should().HaveCount(expectedCount);
     }
 
     [Fact]
@@ -162,6 +168,26 @@ public class NoteEndpointTests : IntegrationTestBase
 
         body!.Title.Should().Be("Updated Title");
         body.Body.Should().Be("Updated Body");
+    }
+
+    [Fact]
+    public async Task Update_WhenCategoryChanges_Returns200WithUpdatedCategory()
+    {
+        var (client, note) = await CreateAuthenticatedClientWithNoteAsync();
+        var categoryResponse = await client.GetAsync("/categories/", CancellationToken.None);
+        var categories = await categoryResponse.Content.ReadFromJsonAsync<IEnumerable<CategoryResponse>>(CancellationToken.None);
+        var category = categories!.First();
+
+        var response = await client.PutAsJsonAsync($"/notes/{note.Id}", new
+        {
+            title = note.Title,
+            body = note.Body,
+            categoryId = category.Id,
+        }, CancellationToken.None);
+        var body = await response.Content.ReadFromJsonAsync<NoteResponse>(CancellationToken.None);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body!.Category!.Id.Should().Be(category.Id);
     }
 
     [Fact]
