@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 
 namespace Sanctuary.IntegrationTests.Features.Notes;
 
+[Trait("Category", "Integration")]
 public class NoteEndpointTests : IntegrationTestBase
 {
     private static readonly object ValidCreateRequest = new

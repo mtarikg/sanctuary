@@ -13,7 +13,7 @@ public static class AuthEndpoints
 
         group.MapPost(AuthRoutes.Register, Register)
             .WithSummary("Register a new user")
-            .Produces<AuthResponse>(StatusCodes.Status201Created)
+            .Produces<AuthResponse>()
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status409Conflict)
             .Produces(StatusCodes.Status429TooManyRequests);

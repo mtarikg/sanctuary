@@ -27,6 +27,7 @@ public abstract class AuthServiceTestsBase
         new(db, HasherMock.Object, TokenServiceMock.Object);
 }
 
+[Trait("Category", "Unit")]
 public class AuthService_RegisterTests : AuthServiceTestsBase
 {
     private void SetupSuccessMocks()
@@ -99,6 +100,7 @@ public class AuthService_RegisterTests : AuthServiceTestsBase
     }
 }
 
+[Trait("Category", "Unit")]
 public class AuthService_LoginTests : AuthServiceTestsBase
 {
     private static User ExistingUser() => new()
